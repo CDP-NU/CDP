@@ -1,0 +1,7 @@
+[ignore]
+.*/node_modules/rc-editor-mention/.*
+.*/node_modules/fbjs/.*
+.*/node_modules/draft-js/.*
+
+[libs]
+.src/types/

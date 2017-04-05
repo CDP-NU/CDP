@@ -1,0 +1,43 @@
+.axis path, .axis line {
+    fill: none;
+    // stroke: #fff;
+}
+.axis text {
+    font-size: 13px;
+}
+.bar {
+    fill: rgba(0, 66, 128, 0.25);
+}
+.bar:hover {
+    fill: rgba(0, 66, 128, 0.50);
+}
+svg text.label {
+    fill:white;
+    font: 15px;  
+    font-weight: 400;
+    text-anchor: middle;
+}
+#bargraph {
+    height: 100%;
+    min-height: 400px;
+    min-width: 531px;
+    //  width: 100%;
+}
+
+
+
+.line {
+    fill: none;
+    stroke: steelblue;
+    stroke-width: 2px;
+}
+
+.grid line {
+    stroke: lightgrey;
+    stroke-opacity: 0.7;
+    shape-rendering: crispEdges;
+}
+
+.grid path {
+    stroke-width: 0;
+}
