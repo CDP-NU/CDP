@@ -1,59 +1,157 @@
-import R from 'ramda'
-import {
-    AUTOCOMPLETE,
-    UPDATE_AUTOCOMPLETIONS,
-    CLEAR_AUTOCOMPLETIONS,
-    SEARCH_DATABASE,
-    UPDATE_SEARCH_RESULTS,
-    SELECT_RACE_MAP,
-    SELECT_CANDIDATE_MAP
-} from './actions'
+import * as actions from './actions'
+import { injectEntity } from './utility'
 
-const createEntityReducer = (name, onUpdate) => (state = {}, action) => {
+export const autocompletions = injectEntity(
+    'autocompletions',
+    (state = {}) => state,
+    (_, autocompletions, {data: {keyword}}) => ({
+	[keyword]: autocompletions
+    })
+)
 
-    const entities = R.path(['entities', name], action)
-    return entities ? onUpdate(state, entities) : state
-}
-	
+export const searchResults = injectEntity(
+    'searchResults',
+    (state = []) => state,
+    (_, searchResults, {data: {timestamp}}) => ({
+	[timestamp]: searchResults
+    })
+)
 
-export const autocompletions = (state = [], action) => {
-    switch(action.type) {
-	case AUTOCOMPLETE:
-	    return R.isEmpty(state) ? [' '] : state
-	case UPDATE_AUTOCOMPLETIONS:
-	    return R.defaultTo(
-		[' '], action.entities.autocompletions
+
+
+export const race = injectEntity(
+    'race',
+    (state = {}) => state,
+    (state, {id, ...race}) => ({
+	...state,
+	[id]: {
+	    id,
+	    ...race
+	}
+    })
+)
+
+export const candidates = injectEntity(
+    'candidates',
+    (state = {}) => state,
+    (state, candidates, {data: {race}}) => ({
+	...state,
+	[race]: candidates
+    })
+)
+
+
+
+export const raceWardMap = injectEntity(
+    'raceWardMap',
+    (state = {}) => state,
+    (state, map, {data: {race}}) => ({
+	...state,
+	[race]: map
+    })
+)
+
+export const racePrecinctMap = injectEntity(
+    'racePrecinctMap',
+    (state = {}) => state,
+    (state, map, {data: {race}}) => ({
+	...state,
+	[race]: map
+    })
+)
+/* [[ward: 3, registeredVoters: 21020, turnout: 0.02]] */
+export const raceWardStats = injectEntity(
+    'raceWardStats',
+    (state = {}) => state,
+    (state, stats, {data: {race}}) => ({
+	...state,
+	[race]: stats
+    })
+)
+
+
+
+export const candidateWardMap = injectEntity(
+    'candidateWardMap',
+    (state = {}) => state,
+    (state, map, {data: {candidate}}) => ({
+	...state,
+	[candidate]: map
+    })
+)
+
+export const candidatePrecinctMap = injectEntity(
+    'candidatePrecinctMap',
+    (state = {}) => state,
+    (state, map, {data: {candidate}}) => ({
+	...state,
+	[candidate]: map
+    })
+)
+
+
+export const geojson = injectEntity(
+    'geojson',
+    (state = {}) => state,
+    (state, geojson, {data: {geojson: id}}) => ({
+	...state,
+	[id]: geojson
+    })
+)
+
+export const geocode = injectEntity(
+    'geocode',
+    (state = {}) => state,
+    (state, geocode, {data: {street}}) => ({
+	[street]: geocode
+    })
+)
+
+
+const appendCandidateToPopup = (
+    html, {name, votes, pct}
+) => `${html}<br/> ${name}: ${votes} votes, ${pct}%`
+
+export const ward = injectEntity(
+    'ward',
+    (state = {}) => state,
+    (state, candidates, {data: {timestamp, ward}}) => ({
+	[timestamp]: candidates.reduce(
+	    appendCandidateToPopup,
+	    `<h3>Ward: ${ward}</h3>`
+	)
+    })
+)
+
+export const precinct = injectEntity(
+    'precinct',
+    (state = {}) => state,
+    (state, candidates, {data: {timestamp, wpid}}) => {
+	const precinct = wpid % 1000
+	const ward = (wpid - precinct) / 1000
+	return {
+	    [timestamp]: candidates.reduce(
+		appendCandidateToPopup,
+		`<h3>Ward: ${ward}, Precinct: ${precinct}</h3>`
 	    )
-	case SEARCH_DATABASE:
-	case CLEAR_AUTOCOMPLETIONS:
-	    return []
-	default:
-	    return state
+	}
     }
-}
+)
 
-export const searchResults = (state = {
-    timestamp: undefined,
-    items: []
-}, action) => {
+
+export const failedRequests = (state = {}, action) => {
     switch(action.type) {
-	case UPDATE_SEARCH_RESULTS:
-	    return action.entities.searchResults
-	case SELECT_RACE_MAP:
-	case SELECT_CANDIDATE_MAP:
-	    return action.data.isMobile ? {
+	case actions.FAILED_REQUEST:
+	    const {requestName, errorType, timestamp} = action.data
+	    return {
 		...state,
-		items: []
-	    } : state
+		[requestName]: {
+		    request: requestName,
+		    type: errorType,
+		    timestamp
+		}
+	    }
 	default:
 	    return state
     }
 }
-
-
-
-export const races = createEntityReducer('races', R.merge)
-export const candidates = createEntityReducer('candidates', R.merge)
-export const maps = createEntityReducer('maps', R.merge)
-export const geojsons = createEntityReducer('geojsons', R.merge)
-export const popup = createEntityReducer('popup', (_, next) => next)

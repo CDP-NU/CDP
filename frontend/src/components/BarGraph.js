@@ -1,12 +1,10 @@
 import React from 'react'
-import R from 'ramda'
-import { compose } from 'redux'
-import { connect } from 'react-redux'
 import * as d3 from 'd3'
-import { withState } from 'recompose'
+import { compose, branch, renderNothing, mapProps } from 'recompose' 
 import './BarGraph.css'
-import withMutation from './Mutation'
-import { getBarGraphCandidates } from '../selectors'
+import withQuery from './Query'
+import withSubscription from './Subscription'
+import * as actions from '../actions'
 
 //http://cagrimmett.com/til/2016/04/26/responsive-d3-bar-chart.html
 //https://bl.ocks.org/d3noob/c506ac45617cf9ed39337f99f8511218
@@ -126,8 +124,8 @@ const loadD3 = (data = []) => {
   		.attr("class", "bar")
   		.attr("x", d => xScale(d.name) )
   		.attr("width", xScale.bandwidth())
-  		.attr("y", d => yScale(d.votePct) )
-  		.attr("height", d => height - yScale(d.votePct))
+  		.attr("y", d => yScale(d.pct) )
+  		.attr("height", d => height - yScale(d.pct))
 
 
 
@@ -139,9 +137,9 @@ const loadD3 = (data = []) => {
 		.append("text")
 		.attr("class","label")
 		.attr("x", d => xScale(d.name) + xScale.bandwidth() / 2)
-		.attr("y", d => yScale(d.votePct) + 1)
+		.attr("y", d => yScale(d.pct) + 1)
 		.attr("dy", ".75em")
-				.text(d => `${d.votePct}%`)
+				.text(d => `${d.pct}%`)
 
     svgContainer.append("text")
 				.attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
@@ -153,7 +151,13 @@ const loadD3 = (data = []) => {
 class BarGraph extends React.Component {
 
     componentDidMount() {
-	this.props.onBargraphChange(true)
+	loadD3(this.props.candidates)
+    }
+
+    componentWillReceiveProps(next) {
+	if(this.props.candidates !== next.candidates) {
+	    loadD3(next.candidates)
+	}
     }
 
     shouldComponentUpdate() {
@@ -168,15 +172,14 @@ class BarGraph extends React.Component {
 }
 
 export default compose(
-    connect(
-	(state, props) => ({
-	    entities: getBarGraphCandidates(state, props)
-	})
+    mapProps( ({match}) => ({...match.params}) ),
+    withQuery(
+	actions.REQUEST_RACE_WARD_GRAPH,
+	['race']
     ),
-    withState('bargraph', 'onBargraphChange', false),
-    withMutation({
-	skip: ({bargraph, entities}, prev) =>
-	    !bargraph || !entities || (entities === prev.entities && prev.bargraph),
-	run: ({entities}) => loadD3(entities)
-    })
+    withSubscription({candidates: 'race'}),
+    branch(
+	({loading}) => loading,
+	renderNothing
+    )
 )(BarGraph)

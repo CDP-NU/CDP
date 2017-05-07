@@ -1,7 +1,6 @@
 import React from 'react'
-import { compose } from 'redux'
-import { withState, withHandlers } from 'recompose'
-import { Input, Button } from 'antd'
+import { compose, withState, withHandlers } from 'recompose'
+import { Input } from 'antd'
 const InputGroup = Input.Group
 
 const Geocode = ({value, onChange, onSearch}) => (
@@ -17,10 +16,10 @@ const Geocode = ({value, onChange, onSearch}) => (
 )
 
 export default compose(
-    withState('value', 'submit', ''),
+    withState('value', 'setValue', ''),
     withHandlers({
-	onChange: ({submit}) => ({target}) =>
-	    submit(target.value),
+	onChange: ({setValue}) => ({target}) =>
+	    setValue(target.value),
 	onSearch: ({value, onGeocode}) => () => onGeocode(value)
     })
 )(Geocode)

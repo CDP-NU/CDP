@@ -1,41 +1,82 @@
 import React from 'react'
 import { Input, AutoComplete } from 'antd'
-import { connect } from 'react-redux'
-import { compose } from 'redux'
-import { autocomplete, clearAutocompletions } from '../creators'
-import { getAutocompletions } from '../selectors'
-
+import { compose, withState, mapProps } from 'recompose'
+import withQuery from './Query'
+import withSubscription from './Subscription'
+import { REQUEST_AUTOCOMPLETIONS } from '../actions'
 
 const AutocompleteForm = ({
+    value,
     autocompletions,
     onChange,
-    onKeywordSubmit,
-    onClear
+    onSearch,
+    onSelect
 }) => (
     <div className="autocomplete-wrap">
 	<AutoComplete size="large"
 		      className="autocomplete"
 		      placeholder="Search race or candidate"
+		      value={value}
 		      showArrow={false}
 		      filterOption={false}
 		      dataSource={autocompletions}
 		      onChange={onChange}
-		      onSelect={onKeywordSubmit}
-		      onBlur={onClear}>
+		      onSelect={onSelect}>
 	    <Input.Search/>
 	</AutoComplete>
     </div>
 )
-    
 
-export default compose(
-    connect(
-	state => ({
-	    autocompletions: getAutocompletions(state)
-	}),
-	{
-	    onChange: autocomplete,
-	    onClear: clearAutocompletions
+class Container extends React.Component {
+    
+    willSearch = false
+
+    state = {value: ''}
+    
+    handleChange = value => {
+
+	if(this.willSearch) {
+
+	    this.willSearch = false
+	    this.setState({value}, () => this.props.onSearch(this.state.value))
 	}
-    )
-)(AutocompleteForm)
+	else {
+	    this.setState(
+		{value},
+		() => this.props.setAutocompleteKeyword(this.state.value)
+	    )
+	}
+    }
+
+    handleSelect = value => {
+	this.willSearch = true
+    }
+
+
+    
+    render() {
+	return <AutocompleteForm {...this.props} value={this.state.value}
+	onChange={this.handleChange}
+	onSelect={this.handleSelect}
+	onEnter={this.handleEnter}/>
+    }
+}
+
+const empty = ['  ']
+export default compose(
+    withState('keyword', 'setAutocompleteKeyword', ''),
+    withQuery(
+	REQUEST_AUTOCOMPLETIONS,
+	['keyword'],
+	{skipFirst: true}
+    ),
+    withSubscription({autocompletions: 'keyword'}),
+    mapProps(p => {
+	if(p.autocompletions) {
+	    return p
+	}
+	else {
+	    return {...p, autocompletions: empty}
+	}
+    })
+)(Container)

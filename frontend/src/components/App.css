@@ -92,20 +92,22 @@
 }
 
 
-@media (max-width: 690px) {
+@media (max-width: 800px) {
     
     .sidebar {
+	position: static;
 	width: 100%;
 	height: auto;
     }
 
-    .top-bar {
-	display: none;
+    .main-content {
+	position: static;
+	height: 100%;
+	overflow-y: scroll;
     }
     
     .map-container {
-	position: fixed;
-	left: 0;
+	height: 80vh;
     }
 }
 

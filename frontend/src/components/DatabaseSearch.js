@@ -1,18 +1,16 @@
 import React from 'react'
-import { Card, Tag, DatePicker, Collapse } from 'antd'
-import { compose } from 'redux'
-import { connect } from 'react-redux'
-import R from 'ramda'
-const RangePicker = DatePicker.RangePicker
-const Panel = Collapse.Panel
-const CheckableTag = Tag.CheckableTag
+import { compose, mapProps, withState, withHandlers, flattenProp, withProps, branch } from 'recompose'
+import { Card, Tag, Collapse, Slider } from 'antd'
 import Autocomplete from './Autocomplete'
 import RaceMenu from './RaceMenu'
-import moment from 'moment'
-import { withState, withHandlers, flattenProp } from 'recompose'
-import withMutation from './Mutation'
-import { searchDatabase } from '../creators'
-import { eqByProp, merge } from '../utility'
+import withQuery from './Query'
+import withSubscription from './Subscription'
+import { REQUEST_SEARCH_RESULTS } from '../actions'
+import { tap, mergeProps  } from '../utility'
+
+const Panel = Collapse.Panel
+const CheckableTag = Tag.CheckableTag
+
 
 const electionTags = [
     'Democratic Primary',
@@ -48,12 +46,12 @@ const TagGroup = ({tags = [], selected = [], onSelectionChange}) => (
 	{tags.map(
 	     tag => (
 		 <CheckableTag key={tag}
-			       checked={R.contains(tag, selected)}
+			       checked={selected.includes(tag)}
 			       onChange={checked =>
 				   onSelectionChange(
 				       checked ?
 				       [...selected, tag] :
-				       R.reject(R.equals(tag), selected)
+				       selected.filter( t => t !== tag )
 				   )}>
 		     {tag}
 		 </CheckableTag>
@@ -73,26 +71,34 @@ const createRemovableTags = (tags, onClose) => tags.map(
 
 const DatabaseSearch = ({
     keyword,
-    dateRange,
     elections,
     offices,
+    startYear,
+    endYear,
+    showSearchResults,
+    searchResults,
     onKeywordChange,
-    onDateChange,
     onElectionChange,
     onOfficeChange,
+    onStartYearChange,
+    onEndYearChange,
     onKeywordTagClose,
     onElectionTagClose,
     onOfficeTagClose
 }) => (
     <div className="database-search">
 	<div className="search-filters">
-	    <Autocomplete onKeywordSubmit={onKeywordChange}/>
+	    <Autocomplete onSearch={onKeywordChange}/>
 	    <Collapse style={{width: '100%'}}>
-		<Panel header="Search Tools" key="1">
-		    <RangePicker style={{marginBottom: '10px'}}
-				 format="YYYY/MM/DD"
-				 value={dateRange}
-				 onChange={onDateChange}/>
+		<Panel header="Search Tools"
+		       key="1">
+		    <h4>Year Range</h4>
+		    <p>{`${startYear} - ${endYear}`}</p>
+		    <Slider range
+			    min={2000}
+			    max={2017}
+			    value={[startYear, endYear]}
+			    onChange={onStartYearChange}/>
 		    <Card  title="Election Type"
 			   bordered={false}>
 			<TagGroup tags={electionTags}
@@ -108,7 +114,7 @@ const DatabaseSearch = ({
 		</Panel>
 	    </Collapse>
 
-	    {keyword || elections.length || offices.length ?
+	    {showSearchResults ?
 	     <div className="search-tags">
 		 {keyword !== '' ?
 		  <Tag closable onClose={onKeywordTagClose}>{keyword}</Tag> :
@@ -118,49 +124,61 @@ const DatabaseSearch = ({
 	     </div>
 	     : null}
 	</div>
-	<RaceMenu/>
+	<RaceMenu races={searchResults}/>
     </div>
 )
 
 export default compose(
-    connect(
-	null,
-	{onChange: searchDatabase}
-    ),
-    withState(
-	'searchForm',
-	'submit',
-	{
-	    keyword: '',
-	    dateRange: [moment('2000/01/01', 'YYYY/MM/DD'), moment()],
-	    elections: [],
-	    offices: []
-	}
-    ),
-    withMutation({
-	skipFirst: true,
-	skip: eqByProp('searchForm'),
-	run: ({searchForm, onChange}) => onChange(searchForm)
+    withState('searchForm', 'setSearchForm', {
+	keyword: '',
+	startDate: "2000/01/01",
+	endDate: "2017/12/31",
+	elections: [],
+	offices: []
     }),
+    withProps( ({searchForm: {keyword, elections, offices}}) => ({
+	showSearchResults: keyword ||
+			   elections.length > 0 ||
+			   offices.length > 0
+    })),
+    branch(
+	({showSearchResults}) => showSearchResults,
+	compose(
+	    withQuery(REQUEST_SEARCH_RESULTS, ['searchForm']),
+	    withSubscription({searchResults: 'requestID'})
+	)
+    ),
     withHandlers({
-	onKeywordChange: ({submit}) => keyword =>
-	    submit(merge({keyword})),
-	onDateChange: ({submit}) => dateRange =>
-	    submit(merge({dateRange})),
-	onElectionChange: ({submit}) => elections =>
-	    submit(merge({elections})),
-	onOfficeChange: ({submit}) => offices =>
-	    submit(merge({offices})),
-	onKeywordTagClose: ({submit}) => () =>
-	    submit(merge({keyword: ''})),
-	onElectionTagClose: ({submit}) => name =>
-	    submit(R.evolve({
-		elections: R.reject(R.equals(name))
-	    })),   
-	onOfficeTagClose: ({submit}) => name =>
-	    submit(R.evolve({
-		offices: R.reject(R.equals(name))
-	    }))	 
+	onKeywordChange: ({searchForm, setSearchForm}) => keyword => 
+	    setSearchForm(mergeProps({keyword})),
+	onElectionChange: ({setSearchForm}) => elections =>
+	    setSearchForm(mergeProps({elections})),
+	onOfficeChange: ({setSearchForm}) => offices =>
+	    setSearchForm(mergeProps({offices})),
+	onStartYearChange: ({setSearchForm}) => ([start, end]) => 
+	    setSearchForm(mergeProps({
+		startDate: `${start}/01/01`,
+		endDate: `${end}/12/31`
+	    })),
+	onEndYearChange: ({setSearchForm}) => year =>
+	    setSearchForm(mergeProps({endDate: `${year}/12/31`})),
+	onKeywordTagClose: ({setSearchForm}) => () =>
+	    setSearchForm(mergeProps({keyword: ''})),
+	onElectionTagClose: ({setSearchForm}) => name =>
+	    setSearchForm(({elections, ...form}) => ({
+		...form,
+		elections: elections.filter( e => e !== name)
+	    })),
+	onOfficeTagClose: ({setSearchForm}) => name =>
+	    setSearchForm(({offices, ...form}) => ({
+		...form,
+		offices: offices.filter( o => o !== name)
+	    }))
     }),
-    flattenProp('searchForm')
+    flattenProp('searchForm'),
+    mapProps(({startDate, endDate, ...props}) => ({
+	...props,
+	startYear: parseInt(startDate.substr(0, 4), 10),
+	endYear: parseInt(endDate.substr(0, 4), 10)
+    }))
 )(DatabaseSearch)

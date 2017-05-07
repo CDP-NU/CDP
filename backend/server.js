@@ -1,220 +1,228 @@
-const express = require('express');
-const path = require('path');
-const massive = require("massive");
-const request = require('request');
-const app = express();
-var parser = require('body-parser');
+const express = require('express')
+const path = require('path')
+const massive = require('massive')
+const request = require('request')
+const app = express()
+const parser = require('body-parser')
 
 app.use(express.static('public'))
 app.use(parser.json())
 
-const connectionString = process.env.CDP_CONNECTION_STRING
+const connectionString = CDP_DATABASE_STRING
+
 const massiveDb = massive.connectSync({connectionString: connectionString})
-app.set('db', massiveDb);
+app.set('db', massiveDb)
 
 const base = '/database/election'
 
-app.post(`${base}/races/search/keyword`, (req, res) => {
 
-    var keyword = req.body.keyword;
-    var start = req.body.startDate;
-    var end = req.body.endDate;
-    var elections = req.body.elections;
-    var offices = req.body.offices;
+const createDbHandler = (res, params, config) => (err, dbResponse) => {
 
-    var db = app.get('db');
-
-    var sql = 'SELECT * FROM search_keyword($1, $2, $3, $4, $5)'
-
-    db.run(sql, [keyword, start, end, elections, offices], (err, races) => {
-	res.json(races)
-    })
-})
-
-app.post(`${base}/races/search/filters`, (req, res) => {
-
-    var start = req.body.startDate;
-    var end = req.body.endDate;
-    var elections = req.body.elections;
-    var offices = req.body.offices; 
-
-    var db = app.get('db');
-
-    var sql = 'SELECT * FROM search_filter($1, $2, $3, $4)'
-
-    db.run(sql, [start, end, elections, offices], (err, races) => {
-	res.json(races)
-    })
-})
-
-app.get(`${base}/races/autocomplete/:keyword`, (req, res) => {
-    const keyword = req.params.keyword
-    const db = app.get('db');
-
-    const sql = 'SELECT get_autocompletions($1) autocompletions'
-
-    db.run(sql, [keyword], (err, data) => {
-	res.json(data[0])
-    })
-})
-
-app.get(`${base}/uri/:uri/level/:level/winners`, (req, res) => {
-    const {uri, level} = req.params
-    const db = app.get('db');
-
-    const sql = 'SELECT get_race_info_and_candidates(id) "uriInfo", get_race_winner_colors(id, $2) winners FROM get_race_at_uri($1) id'
-
-    db.run(sql, [uri, level], (err, raceData) => {
-	if(!err) {
-	    const map = raceData[0] || {}
-	    const {race, candidates} = map.uriInfo
-	    const {candidateColors, zoneColors} = map.winners
-	    race.candidates = candidates
-	    res.json({
-		race,
-		candidateColors,
-		zoneColors
-	    })
-	}
-	else {
-	    res.json({})
-	}
-    })
-})
-
-
-app.get(`${base}/uri/:uri/candidate/:candidate/level/:level/colors`, (req, res) => {
-    const {uri, candidate, level} = req.params
-    const db = app.get('db');
-
-    const sql = 'SELECT get_race_info_and_candidates(id) "uriInfo", get_candidate_zone_colors(id, $2, $3) "candidateZones" FROM get_race_at_uri($1) id'
-
-    db.run(sql, [uri, candidate, level], (err, data) => {
-
-	if(!err) {
-	    const map = data[0] || {}
-	    const {race, candidates} = map.uriInfo
-	    const {rangeColors, zoneColors} = map.candidateZones
-	    race.candidates = candidates
-	    res.json({
-		race,
-		rangeColors,
-		zoneColors
-	    })
-	}
-	else {
-	    res.json({})
-	}
-    })
-})
-
-app.get("/database/election/graph/:uri/:level", (req, res) => {
-
-    const {uri, level} = req.params
-    const db = app.get('db')
-
-    const sql = 'SELECT get_race_info_and_candidates(id) "uriInfo", get_race_winner_colors(id, $2) winners, get_zones(id, $2) zones FROM get_race_at_uri($1) id'
-
-    db.run(sql, [uri, level], (err, data) => {
-	if(!err) {
-	    const map = data[0] || {}
-	    const {zones} = map
-	    const {race, candidates} = map.uriInfo
-	    const {candidateColors, zoneColors} = map.winners
-	    race.candidates = candidates
-	    res.json({
-		race,
-		candidateColors,
-		zoneColors,
-		zones
-	    })
-	}
-	else {
-	    res.json({})
-	}
-    })  
-})
-
-app.get(`${base}/race/:race/level/:level/zone/:zone/candidates`, (req, res) => {
-    const {race, level, zone} = req.params
-    const db = app.get('db')
-
-    const sql = 'SELECT get_candidate_results_for_zone($1, $2, $3) "zoneCandidates"'
+    const {
+	defaultOnEmptyResponse,
+	single = true,
+	select
+    } = config
     
-    db.run(sql, [race, level, zone], (err, data) => {
-	res.json(data[0])
-    })
-})
+    if(err) {
+	console.log('err', err, 'response',  dbResponse)
+	res.sendStatus(500)
+    }
+    else if(!dbResponse.length) {
+	if(defaultOnEmptyResponse) {
+	    res.json({data: defaultOnEmptyResponse})
+	}
+	else {
+	    res.sendStatus(404)
+	}
+    }
+    else {
+	if(single) {
 
-app.get(`${base}/geocode/:street`, (req, res) => {
+	    const [dbData] = dbResponse
+	    
+	    if(select) {
 
-    const street = req.params.street
-    const census = 'https://geocoding.geo.census.gov/geocoder/locations/address?street='
-    const rest = '&city=Chicago&state=IL&benchmark=Public_AR_Census2010&format=json'
-
-    const getUrl = census + street + rest
-
-    const db = app.get('db');
-
-    request(getUrl, function (error, response, body) {
-	if (!error && response.statusCode == 200) {
-	    const data = JSON.parse(body)
-	    const result = data.result
-	    const addressMatches = result && result.addressMatches
-	    const match = addressMatches && addressMatches[0]
-	    const coordinates = match && match.coordinates
-
-	    if(coordinates) {
-
-		const sql = 'SELECT zone_at_coordinates($1, $2) loc'
-		const latlng = [coordinates.y, coordinates.x]
+		const requestedEntities = select.filter(
+		    name => params[name]
+		)
 		
-		db.run(sql, [coordinates.y, coordinates.x], (err, data) => {
-		    
-		    const loc = data[0] && data[0].loc || {}
+		const entityData = requestedEntities.reduce(
+		    (entities, name) => Object.assign(
+			{}, entities, {[name]: dbData[name]}
+		    ),
+		    {}
+		)
 
-		    res.json({
-			ward: loc.ward,
-			precinct: loc.precinct,
-			latlng
-		    })
-		})
+		res.json({data: entityData})
+	    }
+	    else {
+		res.json({data: dbData})
 	    }
 	}
-	else { res.json({}) }
-    })
-})
+	else {
+	    res.json({data: dbResponse})
+	}
+    }
+}
 
-app.get(`${base}/boundary/:year/:level`, (req, res) => {
+const useDbHandler = (url, callback, config = {}) => {
 
-    const year = req.params.year
-    const level = req.params.level
+    const {method = 'GET'} = config
+    
+    const loc = base + url
+    
+    switch (method) {
+	case 'GET':
+	    app.get(loc, (req, res) => callback(
+		req.params,
+		app.get('db'),
+		createDbHandler(res, req.query, config),
+		res
+	    ))
+	    break
+	case 'POST':
+	    app.post(loc, (req, res) => callback(
+		req.body,
+		app.get('db'),
+		createDbHandler(res, {}, config),
+		res
+	    ))
+	    break
+	default:
+	    break
+    }
+}
 
-    const getGeojsonFileName = (year, level) => {
-	if(year === '2003' &&
-	   level === 'ward') {
-	    return 'wards2003'
-	}
-	if(year === '2003' &&
-	   level === 'precinct') {
-	    return 'precincts2003'
-	}
-	if(year === '2015' &&
-	   level === 'ward') {
-	    return 'wards2015'
-	}
-	if(year === '2015' &&
-	   level === 'precinct') {
-	    return 'precincts2015'
-	}
-	return null
+
+useDbHandler(
+    '/autocomplete/:keyword',
+    ({keyword}, db, handler) => db.autocomplete(keyword, handler),
+    {defaultOnEmptyResponse: {autocompletions: []}}
+)
+
+useDbHandler(
+    '/search',
+    (
+	{
+	    keyword,
+	    startDate: start,
+	    endDate: end,
+	    elections,
+	    offices
+	},
+	db,
+	handler
+    ) => keyword ?
+       db.search([keyword, start, end, elections, offices], handler) :
+       db.search_without_keyword([start, end, elections, offices], handler),
+    {
+	method: 'POST',
+	single: false,
+	defaultOnEmptyResponse: []
+    }
+)
+
+
+useDbHandler(
+    '/race/:slug/wards/map',
+    ({slug}, db, handler) =>  { db.get_race_ward_map(slug, handler) },
+    {select: ['race', 'candidates', 'raceWardMap']}
+)
+
+useDbHandler(
+    '/race/:slug/wards/graph',
+    ({slug}, db, handler) => db.get_race_ward_graph(slug, handler),
+    {select: ['race', 'candidates', 'raceWardMap', 'raceWardStats']}
+)
+
+useDbHandler(
+    '/race/:slug/precincts/map',
+    ({slug}, db, handler) => db.get_race_precinct_map(slug, handler),
+    {select: ['race', 'candidates', 'racePrecinctMap']}
+)
+
+
+useDbHandler(
+    '/race/:slug/ward/:ward',
+    ({slug, ward}, db, handler) => db.race_ward([slug, ward], handler),
+    {single: false}
+)
+
+useDbHandler(
+    '/race/:slug/precinct/:wpid',
+    ({slug, wpid}, db, handler) => db.race_precinct([slug, wpid], handler),
+    {single: false}
+)
+
+
+
+useDbHandler(
+    '/candidate/:slug/wards/map',
+    ({slug}, db, handler) => db.get_candidate_ward_map(slug, handler),
+    {select: ['race', 'candidates', 'candidateWardMap']}
+)
+
+useDbHandler(
+    '/candidate/:slug/precincts/map',
+    ({slug}, db, handler) => db.get_candidate_precinct_map(slug, handler),
+    {select: ['race', 'candidates', 'candidatePrecinctMap']}
+)
+
+
+
+useDbHandler(
+    '/geocode/:street',
+    ({street}, db, handler, res) => {
+
+	const census = 'https://geocoding.geo.census.gov/geocoder/locations/address?street='
+	const rest = '&city=Chicago&state=IL&benchmark=Public_AR_Census2010&format=json'
+
+	const getUrl = census + street + rest
+
+	request(getUrl, function (error, response, body) {
+	    if (!error && response.statusCode == 200) {
+
+		const data = JSON.parse(body)
+		const {result = {}} = data
+		const {addressMatches = []} = result 
+		const [match = {}] = addressMatches 
+		const {coordinates} = match
+
+		if(coordinates) {
+		    const latlng = [coordinates.y, coordinates.x]
+		    db.geocode(latlng, handler)
+		}
+		else {
+		    res.json({data: {notFound: true}})
+		}
+	    }
+	    else { res.json({data: {notFound: true}}) }
+	})
+    },
+    {defaultOnEmptyResponse: {notFound: true}}
+)
+
+
+app.get(`${base}/geojson/:geojson`, (req, res) => {
+
+    const {geojson: id} = req.params
+
+    const geojsons = {
+	wards2003: 'wards2003',
+	wards2015: 'wards2015',
+	precincts2003: 'precincts2003',
+	precincts2015: 'precincts2015'
     }
 
-    const name = getGeojsonFileName(year, level)
+    const name = geojsons[id]
 
     if(name) {
 	const loc = `./boundary/${name}.geojson`
-	res.sendFile(path.join(__dirname, loc));
+	res.sendFile(path.join(__dirname, loc))
+    }
+    else {
+	res.sendStatus(404)
     }
 })
 

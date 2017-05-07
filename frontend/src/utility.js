@@ -1,25 +1,89 @@
-import R from 'ramda'
+import Rx from 'rxjs'
+import { compose } from 'redux'
+import { FAILED_REQUEST } from './actions'
 
-export const eqByProp = name => (x, y) => x[name] === y[name]
-export const merge = x => y => ({
-    ...y,
-    ...x
-})
+//REMOVE tap IN PRODUCTION
+/*export const tap = (...messages) => x => {
+    console.log(...messages, x)
+    console.log('one')
+    return x
+}*/
 
-export const onUpdate = f => (...dependencies) =>
-    R.any(R.isNil, dependencies) ? undefined : f(...dependencies)
+export const map = f => values => values.map(f)
 
-export const generateMapId = ({
-    raceUri, level = 'ward', name = 'aggregate'
-}) => `${raceUri}${level}${name}`
+export const isMobile = () => window
+    .matchMedia("(max-width: 690px)")
+    .matches
 
-export const generateGeojsonID = (year, level) => `${year}${level}`
+export const merge = (x, y) => ({...x, ...y})
+export const mergeProps = x => y => ({...y, ...x})
 
-const extractGeoYear = raceUri => {   
-    const raceYear = parseInt(R.take(4, raceUri), 10)
-    return raceYear >= 2015 ? 2015 : 2003
+export const prop = key => x => x[key]
+
+export const eqByProps = (names, x, y) => names.every(
+    name => x[name] === y[name]
+)
+
+export const pick = (keys, x) => keys.reduce(
+    (result, key) => ({
+	...result,
+	[key]: x[key]
+    }),
+    {}
+)
+
+export const errorOf = requestName => ({status}) =>
+    Rx.Observable.of({
+	type: FAILED_REQUEST,
+	data: {
+	    requestName,
+	    timestamp: Date.now(),
+	    errorType: status === 404 ?
+		       'not found' : 'generic'
+	}
+    })
+
+export const injectEntity = (type, reducer, callback) => (state, action) => {
+    if(!state) { return reducer(state, action) }
+    if(action.entities && action.entities[type]) {
+	return callback(state, action.entities[type], action)
+    }
+    return reducer(state, action)
 }
 
-export const geojsonIdFromMap = ({raceUri, level}) => generateGeojsonID(
-    extractGeoYear(raceUri), level
+export const getEntitiesNotInState = compose(
+    entities => entities.map( ({type}) => type ),
+    entities => entities.filter( ({value}) => !value ),
+    ({entityIDs, state}) => Object.keys(entityIDs).map(
+	compose(
+	    ([type, id]) => ({type, id, value: state[type][id]}),
+	    entityType => [entityType, entityIDs[entityType]],
+	)
+    )
 )
+
+
+
+export const checkStateFor = (state, mapRequestToEntityIDs) => request$ => request$
+    .pluck('request')
+    .map( request => ({
+	...request,
+	neededEntities: getEntitiesNotInState({
+	    entityIDs: mapRequestToEntityIDs(request),
+	    state: state.getState()
+	})
+    }))
+    .filter(({neededEntities}) => neededEntities.length > 0)
+
+
+export const candidatesToHtml = map(
+    ({name, color}) => ({
+	color, value: name
+    })
+)
+
+export const stdcatsToHtml = map( ({stdmin, stdmax, color}) => ({
+    color,
+    value: `${stdmin} - ${stdmax}%`
+}))
+

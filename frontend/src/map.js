@@ -8,14 +8,13 @@ const cartoAttribution = `Map tiles by
 
 const cartoUrl = 'http://a.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png'
 
-
 class Map {
 
     map = null
     geojsonLayer = null
     legend = null
 
-    loadMap = node => {
+    loadMap(node) {
 	this.map = L.map(node, {
 	    center: [41.881832, -87.623177],
 	    zoom: 11,
@@ -44,13 +43,7 @@ class Map {
 	})
     }
 
-    addGeojson = ({geojson, zoneColors, zoneKey, mapMetaData}, onClick) => {
-
-	if(this.map.hasLayer(this.geojsonLayer)) {
-	    this.map.removeLayer(this.geojsonLayer)
-	}
-
-	this.map.closePopup()
+    addGeojson({geojson, colors, zoneKey, onClick}) {
 	
 	this.geojsonLayer = L.geoJson(geojson, {
 	    onEachFeature: (feature, layer) => {
@@ -63,7 +56,7 @@ class Map {
 			    [zoneKey]: zone
 			} = layer.feature.properties
 
-			onClick({...mapMetaData, latlng, zone})
+			onClick(latlng, zone)
 		    }
 		})
 	    }
@@ -75,7 +68,7 @@ class Map {
 		[zoneKey]: layerZone
 	    } = layer.feature.properties
 
-	    const color = zoneColors[parseInt(layerZone, 10)]
+	    const color = colors[parseInt(layerZone, 10)]
 	    
 	    const style = {
 		fillColor: color ? color : '#FFF',
@@ -92,18 +85,14 @@ class Map {
 	this.geojsonLayer.addTo(this.map)
     }
 
-    addLegend = ({legendEntities}) => {
-
-	if(this.legend) {
-	    this.map.removeControl(this.legend)
-	}
+    addLegend(entities) {
 
 	this.legend = L.control({
 	    position: 'bottomright'
 	})
 
 	this.legend.onAdd = map => {
-	    const inner = legendEntities.reduce(
+	    const inner = entities.reduce(
 		(x, {color, value}) =>
 		    `${x}<i style="background:${color}"></i>${value}<br>`,
 		''
@@ -120,7 +109,20 @@ class Map {
 	this.legend.addTo(this.map)
     }
 
-    popup = ({latlng, html}) => {
+    
+    removeGeojson() {
+	this.map.removeLayer(this.geojsonLayer)
+    }
+
+    removeLegend() {
+	this.map.removeControl(this.legend)
+    }
+
+    closePopup() {
+	this.map.closePopup()
+    }
+
+    openPopup({latlng, html}) {
 
 	L.popup()
 	 .setLatLng(latlng)
@@ -129,9 +131,6 @@ class Map {
     }
 }
 
-export default node => {
-    const map = new Map()
-    map.loadMap(node)
-    return map
-}
+export default () => new Map()
+
     

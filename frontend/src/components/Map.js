@@ -1,11 +1,14 @@
 import React from 'react'
 import 'leaflet/dist/leaflet.css'
+import PropTypes from 'prop-types'
 import createMap from '../map.js'
 
-export default class extends React.Component {
+class LeafletWrapper extends React.Component {
 
     componentDidMount() {
-	this.props.onMapLoad(createMap(this.node))
+	const map = createMap()
+	map.loadMap(this.node)
+	this.props.onMapLoad(map)
     }
 
     shouldComponentUpdate() {
@@ -16,6 +19,34 @@ export default class extends React.Component {
 	return (
 	    <div className="app-map"
 		 ref={node => { this.node = node }}/>
+	)
+    }
+}
+
+export default class MapProvider extends React.Component {
+
+    state = {
+	map: null
+    }
+
+
+    static childContextTypes = {
+	map: PropTypes.object
+    }
+
+    getChildContext() {
+	return {map: this.state.map}
+    }
+
+
+    handleMapLoad = map => this.setState({map})
+
+    render() {
+	return (
+	    <div className="map-container">
+		<LeafletWrapper onMapLoad={this.handleMapLoad}/>
+		{this.state.map ? this.props.children : null}
+	    </div>
 	)
     }
 }
