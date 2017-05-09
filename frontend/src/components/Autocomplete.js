@@ -74,6 +74,7 @@ export default compose(
 	)
     ),
     mapProps(p => {
+	//Workaround for antd bug https://github.com/ant-design/ant-design/issues/5601
 	if(p.autocompletions) {
 	    return p
 	}

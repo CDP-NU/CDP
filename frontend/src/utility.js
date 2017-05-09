@@ -1,6 +1,6 @@
 import Rx from 'rxjs'
 import { compose } from 'redux'
-import { FAILED_REQUEST } from './actions'
+import * as actions from './actions'
 
 //REMOVE tap IN PRODUCTION
 /*export const tap = (...messages) => x => {
@@ -32,16 +32,30 @@ export const pick = (keys, x) => keys.reduce(
     {}
 )
 
-export const errorOf = requestName => ({status}) =>
-    Rx.Observable.of({
-	type: FAILED_REQUEST,
+
+export const mapActions = [
+    actions.REQUEST_RACE_WARD_MAP,
+    actions.REQUEST_RACE_PRECINCT_MAP,
+    actions.REQUEST_CANDIDATE_WARD_MAP,
+    actions.REQUEST_CANDIDATE_PRECINCT_MAP
+]
+
+export const fetchOf = (requestName, resolver) => response$ => response$
+    .map( responseData => ({
+	...resolver(responseData),
+	type: actions.FETCH,
+	requestName
+    }))
+    .catch( ({status}) => Rx.Observable.of({
+	type: actions.FAILED_REQUEST,
 	data: {
 	    requestName,
 	    timestamp: Date.now(),
 	    errorType: status === 404 ?
 		       'not found' : 'generic'
 	}
-    })
+    }))
+
 
 export const injectEntity = (type, reducer, callback) => (state, action) => {
     if(!state) { return reducer(state, action) }

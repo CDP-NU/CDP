@@ -1,13 +1,5 @@
 import * as actions from './actions'
-import {checkStateFor, errorOf} from './utility'
-
-const mapActions = [
-    actions.REQUEST_RACE_WARD_MAP,
-    actions.REQUEST_RACE_PRECINCT_MAP,
-    actions.REQUEST_CANDIDATE_WARD_MAP,
-    actions.REQUEST_CANDIDATE_PRECINCT_MAP
-]
-
+import { mapActions, checkStateFor, fetchOf} from './utility'
 
 export const autocomplete = (action$, _, {getJSON}) => action$ 
     .ofType(actions.REQUEST_AUTOCOMPLETIONS)
@@ -16,13 +8,13 @@ export const autocomplete = (action$, _, {getJSON}) => action$
     .filter(keyword => !!keyword.trim() && keyword.length > 2)
     .switchMap(
 	keyword => getJSON(`/autocomplete/${keyword}`)
-	    .map(
+	    .let(fetchOf(
+		actions.REQUEST_AUTOCOMPLETIONS,
 		entities => ({
-		    type: actions.FETCHED_AUTOCOMPLETIONS,
 		    data: {keyword},
 		    entities
 		})
-	    ).catch(errorOf(actions.REQUEST_AUTOCOMPLETIONS))
+	    ))
     )
 
 export const search = (action$, _, {post}) => action$ 
@@ -31,13 +23,13 @@ export const search = (action$, _, {post}) => action$
     .throttleTime(200)
     .switchMap(
 	({timestamp, searchForm}) => post(`/search`, searchForm)
-	    .map(
+	    .let(fetchOf(
+		actions.REQUEST_SEARCH_RESULTS,
 		searchResults => ({
-		    type: actions.FETCHED_SEARCH_RESULTS,
 		    data: {timestamp, searchForm},
 		    entities: {searchResults}
 		})
-	    ).catch(errorOf(actions.REQUEST_SEARCH_RESULTS))
+	    ))
     )
 
 
@@ -53,13 +45,13 @@ export const raceWardMap = (action$, state, {getJSON}) => action$
     ).switchMap(
 	({race, neededEntities}) => getJSON(
 	    `/race/${race}/wards/map`, neededEntities
-	).map(
+	).let(fetchOf(
+	    actions.REQUEST_RACE_WARD_MAP,
 	    entities => ({
-		type: actions.FETCHED_RACE_WARD_MAP,
 		data: {race},
 		entities
 	    })
-	).catch(errorOf(actions.REQUEST_RACE_WARD_MAP))
+	))
     )
 
 export const raceWardGraph = (action$, state, {getJSON}) => action$
@@ -74,13 +66,13 @@ export const raceWardGraph = (action$, state, {getJSON}) => action$
     ).switchMap(
 	({race, neededEntities}) => getJSON(
 	    `/race/${race}/wards/graph`, neededEntities
-	).map(
+	).let(fetchOf(
+	    actions.REQUEST_RACE_WARD_GRAPH,
 	    entities => ({
-		type: actions.FETCHED_RACE_WARD_GRAPH,
 		data: {race},
 		entities
 	    })
-	).catch(errorOf(actions.REQUEST_RACE_WARD_GRAPH))
+	))
     )
 
 export const racePrecinctMap = (action$, state, {getJSON}) => action$
@@ -94,16 +86,14 @@ export const racePrecinctMap = (action$, state, {getJSON}) => action$
     ).switchMap(
 	({race, neededEntities}) => getJSON(
 	    `/race/${race}/precincts/map`, neededEntities
-	).map(
+	).let(fetchOf(
+	    actions.REQUEST_RACE_PRECINCT_MAP,
 	    entities => ({
-		type: actions.FETCHED_RACE_PRECINCT_MAP,
 		data: {race},
 		entities
 	    })
-	).catch(errorOf(actions.REQUEST_RACE_PRECINCT_MAP))
+	))
     )
-
-
 
 export const candidateWardMap = (action$, state, {getJSON}) => action$
     .ofType(actions.REQUEST_CANDIDATE_WARD_MAP)
@@ -116,13 +106,13 @@ export const candidateWardMap = (action$, state, {getJSON}) => action$
     ).switchMap(
 	({race, candidate, neededEntities}) => getJSON(
 	    `/candidate/${candidate}/wards/map`, neededEntities
-	).map(
+	).let(fetchOf(
+	    actions.REQUEST_CANDIDATE_WARD_MAP,
 	    entities => ({
-		type: actions.FETCHED_CANDIDATE_WARD_MAP,
 		data: {race, candidate},
 		entities
 	    })
-	).catch(errorOf(actions.REQUEST_CANDIDATE_WARD_MAP))
+	))
     )
 
 export const candidatePrecinctMap = (action$, state, {getJSON}) => action$
@@ -136,13 +126,13 @@ export const candidatePrecinctMap = (action$, state, {getJSON}) => action$
     ).switchMap(
 	({race, candidate, neededEntities}) => getJSON(
 	    `/candidate/${candidate}/precincts/map`, neededEntities
-	).map(
+	).let(fetchOf(
+	    actions.REQUEST_CANDIDATE_PRECINCT_MAP,
 	    entities => ({
-		type: actions.FETCHED_CANDIDATE_PRECINCT_MAP,
 		data: {race, candidate},
 		entities
 	    })
-	).catch(errorOf(actions.REQUEST_CANDIDATE_PRECINCT_MAP))
+	))
     )
 
 
@@ -155,13 +145,13 @@ export const geojson = (action$, state, {getFile}) => action$
 	}))
     ).switchMap(
 	({geojson: id}) => getFile(`/geojson/${id}`)
-	    .map(
+	    .let(fetchOf(
+		actions.REQUEST_GEOJSON,
 		geojson => ({
-		    type: actions.FETCHED_GEOJSON,
 		    data: {geojson: id},
 		    entities: {geojson}
 		})
-	    ).catch(errorOf(actions.REQUEST_GEOJSON))
+	    ))
     )
 
 export const geocode = (action$, _, {getJSON}) => action$
@@ -169,24 +159,26 @@ export const geocode = (action$, _, {getJSON}) => action$
     .pluck('request', 'street')
     .switchMap(
 	street => getJSON(`/geocode/${street}`)
-	    .map( geocode => ({
-		type: actions.FETCHED_GEOCODE,
-		data: {street},
-		entities: {geocode}
-	    }))
-	    .catch(errorOf(actions.REQUEST_GEOCODE))
+	    .let(fetchOf(
+		actions.REQUEST_GEOCODE,
+		geocode => ({
+		    data: {street},
+		    entities: {geocode}
+		})
+	    ))
     )
 
 export const ward = (action$, _, {getJSON}) => action$
     .ofType(actions.REQUEST_WARD)
     .pluck('request')
     .switchMap( ({timestamp, race, ward}) => getJSON(`/race/${race}/ward/${ward}`)
-	.map( data => ({
-	    type: actions.FETCHED_WARD,
-	    data: {timestamp, race, ward},
-	    entities: {ward: data}
-	}))
-	.catch(errorOf(actions.REQUEST_WARD))
+	.let(fetchOf(
+	    actions.REQUEST_WARD,
+	    data => ({
+		data: {timestamp, race, ward},
+		entities: {ward: data}
+	    })
+	))
 	.takeUntil(action$.ofType(...mapActions))
     )
 
@@ -195,12 +187,12 @@ export const precinct = (action$, _, {getJSON}) => action$
     .pluck('request')
     .switchMap(
 	({timestamp, race, wpid}) => getJSON(`/race/${race}/precinct/${wpid}`)
-	    .map(
+	    .let(fetchOf(
+		actions.REQUEST_PRECINCT,
 		data => ({
-		    type: actions.FETCHED_PRECINCT,
 		    data: {timestamp, race, wpid},
 		    entities: {precinct: data}
 		})
-	    ).catch(errorOf(actions.REQUEST_PRECINCT))
+	    ))
 	    .takeUntil(action$.ofType(...mapActions))
     )
