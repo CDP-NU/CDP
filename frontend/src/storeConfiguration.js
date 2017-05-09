@@ -73,7 +73,7 @@ const store = createStore(
 const store = createStore(
     rootReducer,
     {},
-    epicMiddleware
+    applyMiddleware(epicMiddleware)
 )
 */
 
