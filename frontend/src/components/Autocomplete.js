@@ -1,6 +1,6 @@
 import React from 'react'
 import { Input, AutoComplete } from 'antd'
-import { compose, withState, mapProps } from 'recompose'
+import { compose, withState, mapProps, branch } from 'recompose'
 import withQuery from './Query'
 import withSubscription from './Subscription'
 import { REQUEST_AUTOCOMPLETIONS } from '../actions'
@@ -64,13 +64,14 @@ class Container extends React.Component {
 
 const empty = ['  ']
 export default compose(
-    withState('keyword', 'setAutocompleteKeyword', ''),
-    withQuery(
-	REQUEST_AUTOCOMPLETIONS,
-	['keyword'],
-	{skipFirst: true}
+    withState('keyword', 'setAutocompleteKeyword', null),
+    branch(
+	({keyword}) => keyword,
+	compose(
+	    withQuery(REQUEST_AUTOCOMPLETIONS, ['keyword']),
+	    withSubscription({autocompletions: 'keyword'})
+	)
     ),
-    withSubscription({autocompletions: 'keyword'}),
     mapProps(p => {
 	if(p.autocompletions) {
 	    return p

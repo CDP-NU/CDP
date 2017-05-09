@@ -39,9 +39,7 @@ const withContainer = (queryType, propNames, config = {}) => Component => class 
 
     
     componentDidMount() {
-	if(!config.skipFirst) {
-	    this.submit()
-	}
+	this.submit()
     }
 
     componentWillReceiveProps(next) {
