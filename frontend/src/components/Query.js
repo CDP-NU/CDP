@@ -11,26 +11,8 @@ const createQueryAction = (type, propNames, props, timestamp = Date.now()) => ({
     }
 })
 
-
-const getError = (lastRequst, currentError, {error, associatedError}) => {
-
     
-    if(error && (error.timestamp > lastRequst)) {
-	return error
-    }
-
-    if(associatedError &&
-       (associatedError.timestamp > lastRequst)) {
-	return associatedError
-    }
-
-
-    return currentError && (currentError.timestamp > lastRequst) ?
-	   currentError : null
-}
-
-    
-const withContainer = (queryType, propNames, config = {}) => Component => class QueryContainer extends React.Component {
+const withContainer = (queryType, propNames) => Component => class QueryContainer extends React.Component {
     
     state = {
 	timeOfLastRequest: null,
@@ -44,14 +26,13 @@ const withContainer = (queryType, propNames, config = {}) => Component => class 
 
     componentWillReceiveProps(next) {
 
-	const {timeOfLastRequest: time} = this.state
+	const {timeOfLastRequest: time, error} = this.state
 
-	if(time) {
-	    const error = getError(time, this.state.error, next)
-
-	    if(error && error !== this.state.error) {
-		this.setState({error})
-	    }
+	if(time && next.error && next.error.timestamp > time) {
+	    this.setState({error: next.error})
+	}
+	else if(time && error && error.timestamp < time) {
+	    this.setState({error: null})
 	}
     }
 
@@ -82,18 +63,15 @@ const withContainer = (queryType, propNames, config = {}) => Component => class 
     }
 }
 
-export default (queryType, propNames, config = {}) => compose(
+export default (queryType, propNames) => compose(
     connect(
 	(state, props) => ({
 	    ...props,
-	    error: state.failedRequests[queryType],
-	    associatedError: config.associatedQuery ?
-		   state.failedRequests[config.associatedQuery] :
-		   null
+	    error: state.failedRequests[queryType]
 	}),
 	{dispatchQuery: createQueryAction}
     ),
-    withContainer(queryType, propNames, config)
+    withContainer(queryType, propNames)
 )
 	    
 	    

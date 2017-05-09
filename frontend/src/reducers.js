@@ -5,15 +5,15 @@ export const autocompletions = injectEntity(
     'autocompletions',
     (state = {}) => state,
     (_, autocompletions, {data: {keyword}}) => ({
-	[keyword]: autocompletions
+	current: autocompletions
     })
 )
 
 export const searchResults = injectEntity(
     'searchResults',
-    (state = []) => state,
+    (state = {}) => state,
     (_, searchResults, {data: {timestamp}}) => ({
-	[timestamp]: searchResults
+	current: searchResults
     })
 )
 

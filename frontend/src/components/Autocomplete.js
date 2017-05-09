@@ -1,6 +1,6 @@
 import React from 'react'
 import { Input, AutoComplete } from 'antd'
-import { compose, withState, mapProps, branch } from 'recompose'
+import { compose, withState, mapProps, branch, defaultProps } from 'recompose'
 import withQuery from './Query'
 import withSubscription from './Subscription'
 import { REQUEST_AUTOCOMPLETIONS } from '../actions'
@@ -69,7 +69,8 @@ export default compose(
 	({keyword}) => keyword,
 	compose(
 	    withQuery(REQUEST_AUTOCOMPLETIONS, ['keyword']),
-	    withSubscription({autocompletions: 'keyword'})
+	    defaultProps({current: 'current'}),
+	    withSubscription({autocompletions: 'current'})
 	)
     ),
     mapProps(p => {

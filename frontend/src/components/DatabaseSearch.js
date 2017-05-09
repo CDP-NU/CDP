@@ -1,5 +1,5 @@
 import React from 'react'
-import { compose, mapProps, withState, withHandlers, flattenProp, withProps, branch } from 'recompose'
+import { compose, mapProps, withState, withHandlers, flattenProp, withProps, branch, defaultProps } from 'recompose'
 import { Card, Tag, Collapse, Slider } from 'antd'
 import Autocomplete from './Autocomplete'
 import RaceMenu from './RaceMenu'
@@ -145,7 +145,8 @@ export default compose(
 	({showSearchResults}) => showSearchResults,
 	compose(
 	    withQuery(REQUEST_SEARCH_RESULTS, ['searchForm']),
-	    withSubscription({searchResults: 'requestID'})
+	    defaultProps({current: 'current'}),
+	    withSubscription({searchResults: 'current'})
 	)
     ),
     withHandlers({
