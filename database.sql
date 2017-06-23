@@ -1,5 +1,9 @@
 -- connectionString = 'postgres://mac_user_name:mac_password@localhost/election'
 
+--psql commands must be executed from root if on the linux server (sudo -i)
+--pg_dump -Fc election5 -U 'cdp' -p 5432 --no-privileges --no-owner > election.bak
+--pg_restore -d 'election' election.bak
+
 CREATE EXTENSION postgis
 CREATE EXTENSION pg_trgm
 
@@ -94,9 +98,9 @@ CREATE TABLE positions (
   color text
 )
 
+
+
 -- Views
-
-
 
 CREATE MATERIALIZED VIEW autocompletions AS
   SELECT DISTINCT label AS race_keyword FROM races
