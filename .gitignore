@@ -1,7 +1,15 @@
 node_modules
-npm-debug.log
+npm-debug.log*
+logs
 build
+
+# Runtime data
+pids
+#.pid
+#.seed
+
 *~
 \#*\#
 .DS_Store
 .\#*
+
