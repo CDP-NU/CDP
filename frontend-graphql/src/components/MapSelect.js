@@ -32,8 +32,8 @@ const MapSelect = ({
 	     )}
 	</Select>
 	<RadioGroup style={{display: 'inline-block'}}
-value={level}
-onChange={onLevelChange}>
+		    value={level}
+		    onChange={onLevelChange}>
 	    <RadioButton value="ward">Ward</RadioButton>
 	    <RadioButton value="precinct">Precinct</RadioButton>
 	</RadioGroup>
