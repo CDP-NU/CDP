@@ -71,14 +71,16 @@ export default {
 	raceWardStats: (_, {id}, {db}) => db
 	    .race_ward_stats(id)
 	    .then( ([{stats}]) => stats ),
-	candidateMap: (_, {id, level}, {db}) => {
+	candidateMap: (_, {race, candidate, level}, {db}) => {
 
 	    const queries = {
 		WARD: 'candidate_ward_map',
 		PRECINCT: 'candidate_precinct_map'
 	    }
 
-	    return db[queries[level]](id)
+	    const candidateID = `${race}+${candidate}`
+	    
+	    return db[queries[level]](candidateID)
 		.then( ([map]) => map )
 	},
 	geojson: (_, {year, level}) => {
@@ -101,6 +103,15 @@ export default {
 		`/boundary/${levelString}${yearString}.geojson`
 	    )) : null
 	} ,
-	geocode: (_, {street}, {db}) => geocode(street, db)
+	geocode: (_, {street}, {db}) => geocode(street, db),
+	zoneCandidateData: (_, {race, level, zone}, {db}) => {
+
+	    const queries = {
+		WARD: 'race_ward',
+		PRECINCT: 'race_precinct'
+	    }
+
+	    return db[queries[level]](race, zone)
+	}
     }
 }

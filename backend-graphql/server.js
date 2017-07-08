@@ -9,7 +9,7 @@ const connectionString = CDP_CONNECTION_STRING
 
 massive({connectionString}).then( db => {
 
-    const GRAPHQL_PORT = 3000;
+    const GRAPHQL_PORT = 8080;
 
     const graphQLServer = express()
 

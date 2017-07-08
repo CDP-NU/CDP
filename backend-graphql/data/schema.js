@@ -1,7 +1,6 @@
 import {
   makeExecutableSchema
-} from 'graphql-tools';
-
+} from 'graphql-tools'
 import resolvers from './resolvers'
 
 const typeDefs = `
@@ -36,7 +35,7 @@ type WardStats {
   turnout: Int
 }
 
-type LegendEntity {
+type Stdcat {
   color: String,
   stdmin: Int,
   stdmax: Int
@@ -44,7 +43,7 @@ type LegendEntity {
 
 type CandidateMap {
   colors: JSON,
-  legend: [LegendEntity]!
+  stdcats: [Stdcat]!
 }
 
 type Geocode {
@@ -54,15 +53,22 @@ type Geocode {
   precinct: Int
 }
 
+type CandidateZoneData {
+  name: String,
+  votes: Int,
+  pct: Int
+}
+
 type Query {
   autocomplete(value: String): [String]!
   search(keyword: String, start: String, end: String, elections: [String], offices: [String]): [Race]!
   geojson(year: Int, level: LEVEL): JSON
   race(id: ID!): Race
   raceMapColors(id: ID!, level: LEVEL!): JSON
-  candidateMap(id: ID!, level: LEVEL!): CandidateMap
+  candidateMap(race: ID!, candidate: Int!, level: LEVEL!): CandidateMap
   raceWardStats(id: ID!): [WardStats]!
   geocode(street: String): Geocode
+  zoneCandidateData(race: ID!, level: LEVEL, zone: Int): [CandidateZoneData]
 }
 
 
@@ -70,4 +76,4 @@ type Query {
 
 const schema = makeExecutableSchema({ typeDefs, resolvers })
 
-export default schema
+export default schema;
