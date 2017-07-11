@@ -31,31 +31,31 @@ type Race {
 
 type WardStats {
   ward: Int!
-  registeredVoters: Int,
-  turnout: Int
+  registeredVoters: Int
+  turnout: Float
 }
 
 type Stdcat {
-  color: String,
-  stdmin: Int,
+  color: String
+  stdmin: Int
   stdmax: Int
 }
 
 type CandidateMap {
-  colors: JSON,
+  colors: JSON
   stdcats: [Stdcat]!
 }
 
 type Geocode {
-  lat: String,
-  lon: String,
-  ward: Int,
+  lat: String
+  lon: String
+  ward: Int
   precinct: Int
 }
 
 type CandidateZoneData {
-  name: String,
-  votes: Int,
+  name: String
+  votes: Int
   pct: Int
 }
 
@@ -69,11 +69,8 @@ type Query {
   raceWardStats(id: ID!): [WardStats]!
   geocode(street: String): Geocode
   zoneCandidateData(race: ID!, level: LEVEL, zone: Int): [CandidateZoneData]
-}
-
-
-`;
+}`
 
 const schema = makeExecutableSchema({ typeDefs, resolvers })
 
-export default schema;
+export default schema
