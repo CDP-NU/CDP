@@ -75,14 +75,32 @@
 }
 
 .autocomplete-wrap {
-    width: 100%;
     margin: 1px 0px;
-    padding: 0px;
+    padding-right: 47px;
 }
 
 .autocomplete {
     width: 100%;
 }
+
+.autocomplete.ant-select-auto-complete .ant-select-selection--single {
+    margin-right: -46px;
+}
+
+.autocomplete.ant-select-auto-complete .ant-input-affix-wrapper .ant-input:not(:last-child) {
+    padding-right: 62px;
+}
+
+.autocomplete.ant-select-auto-complete .ant-input-affix-wrapper .ant-input-suffix {
+    right: 0;
+}
+
+.autocomplete.ant-select-auto-complete .ant-input-affix-wrapper .ant-input-suffix button {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+
 
 .search-tag {
     margin-bottom: 5px;

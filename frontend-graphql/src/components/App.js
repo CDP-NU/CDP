@@ -1,9 +1,9 @@
 import React from 'react'
 import { Switch, Route } from 'react-router-dom'
-import './App.css'
+import './css/App.css'
 import MapPageContainer from './MapPageContainer'
-//import GraphPage from './GraphPage'
-//import DatabaseSearch from './DatabaseSearch'
+import GraphPage from './GraphPage'
+import DatabaseSearchContainer from './DatabaseSearchContainer'
 import TopBar from './TopBar'
 import cdp from './cdp.png'
 
@@ -16,6 +16,7 @@ const App = () => (
 		</a>
 		<h3>Browse Database</h3>
 	    </div>
+	    <DatabaseSearchContainer/>
 	</div>
 	<div className="main-content">
 	    <Route path="/race/:raceID/:display"
@@ -23,6 +24,8 @@ const App = () => (
 	    <Switch>
 		<Route path="/race/:raceID/maps"
 		       component={MapPageContainer}/>
+		<Route path="/race/:raceID/graphs/:graph"
+		       component={GraphPage}/>
 	    </Switch>
 	</div>
     </div>

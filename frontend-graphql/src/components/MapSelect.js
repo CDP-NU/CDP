@@ -1,5 +1,5 @@
 import React from 'react'
-import { compose, withHandlers, branch, mapProps } from 'recompose'
+import { compose, withProps, withHandlers } from 'recompose'
 import { matchPath } from 'react-router-dom'
 import { Select, Radio } from 'antd'
 
@@ -75,13 +75,11 @@ const getMatch = (url, candidates) => {
 
 
 export default compose(
-    branch(
-	({loading, error}) => !loading && !error,
-	mapProps(({url, ...props}) => ({
-	    ...props,
+    withProps( ({loading, error, url, ...props}) =>
+	!loading && !error ? {
 	    list: ['Aggregate', ...props.candidates.map(c => c.name)],
 	    ...getMatch(url, props.candidates)
-	}))
+	} : null
     ),
     withHandlers({
 	onMapSelect: ({raceID, candidates, history, level}) => name => {
