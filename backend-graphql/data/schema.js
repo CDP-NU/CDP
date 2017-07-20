@@ -62,13 +62,13 @@ type CandidateZoneData {
 type Query {
   autocomplete(value: String): [String]!
   search(keyword: String, start: String, end: String, elections: [String], offices: [String]): [Race]!
-  geojson(year: Int, level: LEVEL): JSON
-  race(id: ID!): Race
-  raceMapColors(id: ID!, level: LEVEL!): JSON
-  candidateMap(race: ID!, candidate: Int!, level: LEVEL!): CandidateMap
+  geojson(year: Int, level: LEVEL): JSON!
+  race(id: ID!): Race!
+  raceMapColors(id: ID!, level: LEVEL!): JSON!
+  candidateMap(race: ID!, candidate: Int!, level: LEVEL!): CandidateMap!
   raceWardStats(id: ID!): [WardStats]!
   geocode(street: String): Geocode
-  zoneCandidateData(race: ID!, level: LEVEL, zone: Int): [CandidateZoneData]
+  zoneCandidateData(race: ID!, level: LEVEL, zone: Int): [CandidateZoneData]!
 }`
 
 const schema = makeExecutableSchema({ typeDefs, resolvers })
