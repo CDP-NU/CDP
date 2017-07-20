@@ -1,7 +1,8 @@
 import React from 'react'
+import { Redirect } from 'react-router-dom'
 import { Breadcrumb, Radio } from 'antd'
 import { gql, graphql } from 'react-apollo'
-import { compose, mapProps, withHandlers } from 'recompose'
+import { compose, mapProps, withHandlers, branch, renderComponent } from 'recompose'
 const RadioButton = Radio.Button
 const RadioGroup = Radio.Group
 
@@ -25,6 +26,8 @@ const createBreadcrumbItem = item => (
 
 const style = {display: 'inline-block', marginRight: '20px'}
 
+const ErrorRedirect = ({url}) => <Redirect to={`/?err=500&err_url=${url}`}/>
+
 const Path = ({
     items, display, onDisplayChange
 }) => (
@@ -43,17 +46,23 @@ const Path = ({
 
 
 export default compose(
-    mapProps( ({match, history}) => ({
+    mapProps( ({match, location, history}) => ({
 	raceID: match.params.raceID,
 	display: match.params.display,
+	url: location.pathname,
 	history,
     })),
     graphql(raceQuery, {
 	props: ({ownProps, data: {loading, error, race}}) => ({
 	    ...ownProps,
+	    error: error,
 	    items: !loading && !error ? getItems(race) : []
 	})
     }),
+    branch(
+	({error}) => error,
+	renderComponent(ErrorRedirect)
+    ),
     withHandlers({
 	onDisplayChange: ({raceID, history}) => ({target}) =>
 	    history.push(

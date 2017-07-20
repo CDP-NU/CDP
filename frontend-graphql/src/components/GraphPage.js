@@ -1,6 +1,6 @@
 import React from 'react' 
 import { compose, mapProps, withHandlers } from 'recompose'
-import { Switch, Route } from 'react-router-dom'
+import { Route, Redirect, Switch } from 'react-router-dom'
 import { Select } from 'antd'
 import BarGraph from './BarGraph'
 import ScatterPlot from './ScatterPlot'
@@ -8,7 +8,7 @@ import ScatterPlot from './ScatterPlot'
 const {Option} = Select
 
 
-const ScatterPlotPage = ({raceID, graph, onGraphChange}) => (
+const ScatterPlotPage = ({raceID, graph, url, onGraphChange}) => (
     <div className="scatter-plot_page">
 	<Select style={{ margin: '20px', width: 250 }}
 		size="large"
@@ -22,14 +22,16 @@ const ScatterPlotPage = ({raceID, graph, onGraphChange}) => (
 		   render={() => <BarGraph raceID={raceID}/>}/>
 	    <Route path="/race/:raceID/graphs/turnout"
 		   render={() => <ScatterPlot raceID={raceID}/>}/>
+	    <Redirect to={`/?err=404&err_url=${url}`}/>
 	</Switch>
     </div>
 )
 
 export default compose(
-    mapProps(({match: {params}, ...props}) => ({
+    mapProps(({match, location, ...props}) => ({
 	...props,
-	...params,
+	...match.params,
+	url: location.pathname
     })),
     withHandlers({
 	onGraphChange: ({raceID, history}) => graph =>

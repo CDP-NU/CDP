@@ -1,7 +1,7 @@
-import { compose, mapProps, withState, withHandlers, withProps } from 'recompose'
+import { compose, mapProps, withStateHandlers, withProps } from 'recompose'
 import { gql, graphql } from 'react-apollo'
 import DatabaseSearch from './DatabaseSearch'
-import withThrottledProp from './withThrottledProp'
+import withThrottledProps from './withThrottledProps'
 
 const searchQuery = gql`
 query Search($keyword: String, $start: String!, $end: String!, $elections: [String]!, $offices: [String]!) {
@@ -20,69 +20,66 @@ query Search($keyword: String, $start: String!, $end: String!, $elections: [Stri
 }`
 
 export default compose(
-    withState('searchForm', 'setSearchForm', {
-	keyword: '',
-	start: '2000/01/01',
-	end: '2017/12/31',
-	elections: [],
-	offices: []
-    }),
-    withThrottledProp('searchForm', 500),
-    withProps( ({searchForm: {keyword, elections, offices}}) => ({
+    withStateHandlers(
+	{
+	    keyword: '',
+	    startDate: '2000/01/01',
+	    endDate: '2017/12/31',
+	    elections: [],
+	    offices: []
+	},
+	{
+	    onKeywordChange: () => keyword => ({keyword}),
+	    onElectionChange: () => elections => ({elections}),
+	    onOfficeChange: () => offices => ({offices}),
+	    onYearRangeChange: () => ([start, end]) => ({
+		startDate: `${start}/01/01`,
+		endDate: `${end}/12/31`
+	    }),
+	    onKeywordTagClose: () => () => ({keyword: ''}),
+	    onElectionTagClose: ({elections}) => name => ({
+		    elections: elections.filter( e => e !== name)
+	    }),
+	    onOfficeTagClose: ({offices}) => name => ({
+		    offices: offices.filter( o => o !== name)
+	    })
+	}
+    ),
+    withProps( ({keyword, elections, offices}) => ({
 	hasSubmittedSearch: keyword ||
 			    elections.length ||
 			    offices.length
     })),
+    withThrottledProps(500, props => ({
+	throttledKeyword: props.keyword,
+	throttledStartDate: props.startDate,
+	throttledEndDate: props.endDate,
+	throttledElections: props.elections,
+	throttledOffices: props.offices
+    })),
     graphql(searchQuery, {
 	skip: ({hasSubmittedSearch}) => !hasSubmittedSearch,
-	options: ({throttled}) => ({
-	    variables: throttled
+	options: (props) => ({
+	    variables: {
+		keyword: props.throttledKeyword,
+		start: props.throttledStartDate,
+		end: props.throttledEndDate,
+		elections: props.elections,
+		offices: props.throttledOffices
+	    }
 	}),
-	props: ({ownProps, data}) => ({
+	props: ({ownProps, data: {search}}) => ({
 	    ...ownProps,
-	    ...data
+	    searchResults: search
 	})
     }),
-    withHandlers({
-	onKeywordChange: ({searchForm, setSearchForm}) => keyword => 
-	    setSearchForm(state => ({...state, keyword})),
-	onElectionChange: ({setSearchForm}) => elections =>
-	    setSearchForm(state => ({...state, elections})),
-	onOfficeChange: ({setSearchForm}) => offices =>
-	    setSearchForm(state => ({...state, offices})),
-	onStartYearChange: ({setSearchForm}) => ([start, end]) => 
-	    setSearchForm(state => ({
-		...state,
-		start: `${start}/01/01`,
-		end: `${end}/12/31`
-	    })),
-	onEndYearChange: ({setSearchForm}) => year =>
-	    setSearchForm(state => ({
-		...state,
-		end: `${year}/12/31`
-	    })),
-	onKeywordTagClose: ({setSearchForm}) => () =>
-	    setSearchForm(state => ({...state, keyword: ''})),
-	onElectionTagClose: ({setSearchForm}) => name =>
-	    setSearchForm(({elections, ...state}) => ({
-		...state,
-		elections: elections.filter( e => e !== name)
-	    })),
-	onOfficeTagClose: ({setSearchForm}) => name =>
-	    setSearchForm(({offices, ...state}) => ({
-		...state,
-		offices: offices.filter( o => o !== name)
-	    }))
-    }),
     mapProps(({
-	searchForm: {start, end, ...form},
-	search,
+	startDate,
+	endDate,
 	...props
     }) => ({
 	...props,
-	...form,
-	searchResults: search,
-	startYear: parseInt(start.substr(0, 4), 10),
-	endYear: parseInt(end.substr(0, 4), 10)
+	startYear: parseInt(startDate.substr(0, 4), 10),
+	endYear: parseInt(endDate.substr(0, 4), 10)
     }))
 )(DatabaseSearch)

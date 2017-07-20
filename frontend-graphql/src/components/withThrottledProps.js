@@ -1,19 +1,19 @@
 import React from 'react'
+import { shallowEqual } from '../utility'
 
-export default (propKey, duration) => Wrapped => class WithThrottledProp extends React.Component {
-
-    timer
-    lastExecutionTime
+export default (duration, propsMapper) => Wrapped => class withRateLimitedProps extends React.Component {
 
     constructor(props) {
 	super(props)
-	this.state = {throttled: props[propKey]}
+	this.state = {throttled: propsMapper(props)}
     }
 
     componentWillReceiveProps(next) {
 
-	if(this.props[propKey] !== next[propKey] ) {
-	    this.setThrottledProp(next[propKey])
+	const nextThrottled = propsMapper(next)
+	
+	if(!shallowEqual(this.state.throttled, nextThrottled)) {
+	    this.setThrottledProps(nextThrottled)
 	}
     }
 
@@ -22,7 +22,7 @@ export default (propKey, duration) => Wrapped => class WithThrottledProp extends
     }
 
     
-    setThrottledProp(value) {
+    setThrottledProps(nextThrottled) {
 
 	const currentTime = Date.now()
 
@@ -37,19 +37,20 @@ export default (propKey, duration) => Wrapped => class WithThrottledProp extends
 	    this.timer = setTimeout(
 		() => {
 		    this.lastExecutionTime = currentTime
-		    this.setState({throttled: value})
+		    this.setState({throttled: nextThrottled})
 		},
 		timeLeft
 	    )
 	}
 	else {
 	    this.lastExecutionTime = currentTime
-	    this.setState({throttled: value})
+	    this.setState({throttled: nextThrottled})
 	}
     }
+	    
 
     render() {
 	const {throttled} = this.state
-	return <Wrapped {...this.props} throttled={throttled}/>;
+	return <Wrapped {...this.props} {...throttled}/>
     }
 }

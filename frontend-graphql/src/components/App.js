@@ -1,11 +1,26 @@
 import React from 'react'
 import { Switch, Route } from 'react-router-dom'
+import { Modal } from 'antd'
 import './css/App.css'
 import MapPageContainer from './MapPageContainer'
 import GraphPage from './GraphPage'
 import DatabaseSearchContainer from './DatabaseSearchContainer'
 import TopBar from './TopBar'
+import Map from './Map'
 import cdp from './cdp.png'
+
+class NoMatch extends React.Component {
+
+    componentDidMount() {
+	Modal.error({
+	    title: 'Error: content not found'
+	})
+    }
+
+    render() {
+	return <Map className="home-page_map"/>
+    }
+}
 
 const App = () => (
     <div>
@@ -26,6 +41,15 @@ const App = () => (
 		       component={MapPageContainer}/>
 		<Route path="/race/:raceID/graphs/:graph"
 		       component={GraphPage}/>
+		<Route path="/"
+		       exact={true}
+		       render={({location}) =>
+			   location.search.match(/err=([^&]*)/) ?
+					     <NoMatch/> :
+					     <Map className="home-page_map"/> 
+
+			      }/>
+	        <Route component={NoMatch}/>
 	    </Switch>
 	</div>
     </div>

@@ -75,8 +75,8 @@ const getMatch = (url, candidates) => {
 
 
 export default compose(
-    withProps( ({loading, error, url, ...props}) =>
-	!loading && !error ? {
+    withProps( ({loading, url, ...props}) =>
+	!loading ? {
 	    list: ['Aggregate', ...props.candidates.map(c => c.name)],
 	    ...getMatch(url, props.candidates)
 	} : null

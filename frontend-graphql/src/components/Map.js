@@ -41,8 +41,9 @@ export default class MapProvider extends React.Component {
     handleMapLoad = map => this.setState({map})
 
     render() {
+	const {className} = this.props
 	return (
-	    <div className="map-container">
+	    <div className={className}>
 		<LeafletWrapper onMapLoad={this.handleMapLoad}/>
 		{this.state.map ? this.props.children : null}
 	    </div>

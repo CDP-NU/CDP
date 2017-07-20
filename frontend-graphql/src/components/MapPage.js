@@ -1,5 +1,5 @@
 import React from 'react'
-import { Route, Switch } from 'react-router-dom'
+import { Route, Redirect, Switch } from 'react-router-dom'
 import { Icon } from 'antd'
 import Map from './Map'
 import Geocode from './Geocode'
@@ -16,7 +16,6 @@ const MapPage = ({
     candidates,
     geocodePopup,
     isRaceLoading,
-    raceQueryError,
     onMapSelect,
     onGeocode,
 }) =>  (
@@ -24,9 +23,8 @@ const MapPage = ({
 	<MapSelect url={url}
 		   history={history}
 		   candidates={candidates}
-		   loading={isRaceLoading}
-		   error={raceQueryError}/>
-	<Map>
+		   loading={isRaceLoading}/>
+	<Map className="map-container">
 	    <div className="geocode_container" style={{}}>
 		<p><Icon type="environment"/> Go to address</p>
 		<Geocode onGeocode={onGeocode}/>
@@ -60,6 +58,7 @@ const MapPage = ({
 			                     year={raceGeoYear}
 			                     level="PRECINCT"/>  
 			   )}/>
+	        <Redirect to={`/?err=404&err_url=${url}`}/>
 	    </Switch>
 	    {geocodePopup ? <MapPopup {...geocodePopup}/> : null}
 	</Map>

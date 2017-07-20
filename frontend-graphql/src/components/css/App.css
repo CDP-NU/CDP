@@ -1,7 +1,13 @@
+.home-page_map {
+   // width: 100%;
+    height: 100%;
+}
+
 .map-page {
     width: 100%;
     height: 100%;
 }
+
 
 .map-container {
     position: relative;

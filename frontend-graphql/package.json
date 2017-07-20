@@ -3,15 +3,15 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "antd": "^2.12.0",
-    "d3": "^4.9.1",
+    "antd": "^2.12.1",
+    "d3": "^4.10.0",
     "leaflet": "^1.1.0",
     "prop-types": "^15.5.10",
     "react": "^15.5.4",
-    "react-apollo": "^1.4.3",
+    "react-apollo": "^1.4.4",
     "react-dom": "^15.5.4",
-    "react-router-dom": "^4.1.1",
-    "recompose": "^0.23.5"
+    "react-router-dom": "^4.1.2",
+    "recompose": "^0.24.0"
   },
   "devDependencies": {
     "autoprefixer": "7.1.0",
@@ -39,7 +39,7 @@
     "html-webpack-plugin": "2.28.0",
     "jest": "20.0.3",
     "less": "^2.7.2",
-    "less-loader": "^4.0.3",
+    "less-loader": "^4.0.5",
     "object-assign": "4.1.1",
     "postcss-flexbugs-fixes": "3.0.0",
     "postcss-loader": "2.0.5",

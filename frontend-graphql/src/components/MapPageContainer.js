@@ -1,5 +1,5 @@
 import { gql, graphql } from 'react-apollo'
-import { compose, mapProps, withState, withHandlers } from 'recompose'
+import { compose, mapProps, withStateHandlers } from 'recompose'
 import MapPage from './MapPage'
 
 const raceCandidatesQuery = gql`
@@ -64,11 +64,17 @@ const MapPageContainer = compose(
 	props: ({ownProps, data: {loading, error, race = {}}}) => ({
 	    ...ownProps,
 	    candidates: race.candidates,
-	    isRaceLoading: loading,
-	    raceQueryError: error
+	    isRaceLoading: loading || error,
 	})
     }),
-    withState('geocodeRequest', 'setGeocodeRequest', undefined),
+    withStateHandlers({}, {
+	onGeocode: () => street => ({
+	    geocodeRequest: {
+		street,
+		timestamp: Date.now()
+	    }
+	})
+    }),
     graphql(geocodeQuery, {
 	skip: ({geocodeRequest}) => !geocodeRequest,
 	options: ({geocodeRequest = {}}) => ({
@@ -83,16 +89,11 @@ const MapPageContainer = compose(
 		...props,
 		isGeocodeLoading: loading,
 		geocodeError: error,
-		geocodePopup: !loading && !error ?
+		geocodePopup: !loading && !error  && geocode ?
 			      createGeocodePopup(geocodeRequest, geocode) :
 			      null
 	    }
 	}
-    }),
-    withHandlers({
-	onGeocode: ({setGeocodeRequest}) => street => 
-	    setGeocodeRequest({street, timestamp: Date.now()})
-	
     })
 )(MapPage)
 

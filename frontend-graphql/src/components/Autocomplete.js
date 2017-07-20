@@ -1,12 +1,12 @@
 import React from 'react'
 import { Input, AutoComplete as AntdAutocomplete, Button, Icon} from 'antd'
-import { compose, withState, flattenProp, withHandlers } from 'recompose'
+import { compose, withStateHandlers, withHandlers } from 'recompose'
 import { gql, graphql } from 'react-apollo'
-import withDebouncedProp from './withDebouncedProp'
+import withDebouncedProps from './withDebouncedProps'
 
 const autocompleteQuery = gql`
-query Autocomplete($debounced: String) {
-    autocomplete(value: $debounced)
+query Autocomplete($debouncedValue: String) {
+    autocomplete(value: $debouncedValue)
 }`
 
 
@@ -46,12 +46,20 @@ const nextAutocompleteStatus = {
 }
 
 export default compose(
-    withState('state', 'setState', {
-	value: '',
-	autocompleteStatus: 'active'
-    }),
-    flattenProp('state'),
-    withDebouncedProp('value', 500),
+    withStateHandlers(
+	{
+	    value: '',
+	    autocompleteStatus: 'active'
+	},
+	{
+	    onChange: ({autocompleteStatus: status}) => value => ({
+		value,
+		autocompleteStatus: nextAutocompleteStatus[status]
+	    }),
+	    setStatus: () => autocompleteStatus => ({autocompleteStatus})
+	}
+    ),
+    withDebouncedProps(500, ({value}) => ({debouncedValue: value})),
     graphql(autocompleteQuery, {
 	skip: ({autocompleteStatus, value}) =>
 	    autocompleteStatus !== 'active' || !value.trim() || value.length <= 2,
@@ -61,25 +69,13 @@ export default compose(
 	})
     }),
     withHandlers({
-	onChange: ({setState}) => value => setState(
-	    ({autocompleteStatus}) => ({
-		value,
-		autocompleteStatus: nextAutocompleteStatus[autocompleteStatus]
-	    })
-	),
-	onSelect: ({setState, onSearch}) => value => setState(
-	    state => ({
-		...state,
-		autocompleteStatus: 'deactivatedForSearch'
-	    }), 
-	    () => onSearch(value)
-	),
-	onIconClick: ({onSearch, setState, value}) => () => setState(
-	    state => ({
-		...state,
-		autocompleteStatus: 'willActivateOnNextChange'
-	    }),
-	    () => onSearch(value)
-	)
+	onSelect: ({setStatus, onSearch}) => value => {
+	    setStatus('deactivatedForSearch')
+	    onSearch(value)
+	},
+	onIconClick: ({onSearch, setStatus, value}) => () => {
+	    setStatus('willActivateOnNextChange')
+	    onSearch(value)
+	}
     })
 )(Autocomplete)

@@ -75,8 +75,7 @@ const DatabaseSearch = ({
     onKeywordChange,
     onElectionChange,
     onOfficeChange,
-    onStartYearChange,
-    onEndYearChange,
+    onYearRangeChange,
     onKeywordTagClose,
     onElectionTagClose,
     onOfficeTagClose
@@ -93,7 +92,7 @@ const DatabaseSearch = ({
 			    min={2000}
 			    max={2017}
 			    value={[startYear, endYear]}
-			    onChange={onStartYearChange}/>
+			    onChange={onYearRangeChange}/>
 		    <Card  title="Election Type"
 			   bordered={false}>
 			<TagGroup tags={electionTags}
