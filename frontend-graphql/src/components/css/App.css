@@ -50,7 +50,7 @@
     background-color: #f7f8f9;
     width: 400px;
     height: 100vh;
-    overflow-y: scroll;
+    overflow-y: auto;
 }
 
 .sidebar-tab-pane {

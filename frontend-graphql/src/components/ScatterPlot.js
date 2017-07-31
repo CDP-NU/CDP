@@ -145,13 +145,19 @@ const CandidateScatterPlot = ({candidates, zones}) => (
 
 class NoDataModal extends React.Component {
 
+    modal 
+
     componentDidMount() {
-	Modal.error({
+	this.modal = Modal.error({
 	    title: 'Turnout data not available for this race'
 	})
     }
 
     render() { return null }
+
+    componentWillUnmount() {
+	this.modal.destroy()
+    }
 }
 
 export default compose(

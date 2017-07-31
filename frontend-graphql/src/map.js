@@ -10,9 +10,9 @@ const cartoUrl = 'http://a.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png'
 
 class Map {
 
-    map = null
-    geojsonLayer = null
-    legend = null
+    map 
+    geojsonLayer 
+    legend 
 
     loadMap(node) {
 	this.map = L.map(node, {

@@ -3,6 +3,8 @@ import { shallowEqual } from '../utility'
 
 export default (duration, propsMapper) => Wrapped => class withRateLimitedProps extends React.Component {
 
+    timer
+
     constructor(props) {
 	super(props)
 	this.state = {throttled: propsMapper(props)}
