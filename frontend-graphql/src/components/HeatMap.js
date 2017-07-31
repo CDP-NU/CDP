@@ -1,5 +1,5 @@
 import React from 'react'
-import { compose, withState, withHandlers } from 'recompose'
+import { withStateHandlers } from 'recompose'
 import MapGeojson from './MapGeojson'
 import CandidateDataPopup from './CandidateDataPopup'
 
@@ -25,16 +25,14 @@ const HeatMap = ({
     </MapGeojson>
 )
 
-export default compose(
-    withState('popup', 'setPopup', null),
-    withHandlers({
-	onClick: ({raceID, level, setPopup}) => (latlng, zone) =>
-	    setPopup({
-		popupKey: Date.now(),
-		raceID,
-		level,
-		latlng,
-		zone
-	    })
+export default withStateHandlers({}, {
+    onClick: (_, {raceID, level}) => (latlng, zone) => ({
+	popup: {
+	    popupKey: Date.now(),
+	    raceID,
+	    level,
+	    latlng,
+	    zone
+	}
     })
-)(HeatMap)
+})(HeatMap)

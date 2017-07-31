@@ -1,6 +1,7 @@
 import React from 'react'
 import * as d3 from 'd3'
-import { compose, flattenProp, branch, renderNothing, withPropsOnChange } from 'recompose'
+import { Modal } from 'antd'
+import { compose, flattenProp, branch, renderNothing, withPropsOnChange, renderComponent } from 'recompose'
 import { gql, graphql } from 'react-apollo'
 
 //http://bl.ocks.org/bunkat/2595950
@@ -142,6 +143,17 @@ const CandidateScatterPlot = ({candidates, zones}) => (
     </div>
 )
 
+class NoDataModal extends React.Component {
+
+    componentDidMount() {
+	Modal.error({
+	    title: 'Turnout data not available for this race'
+	})
+    }
+
+    render() { return null }
+}
+
 export default compose(
     graphql(scatterPlotQuery),
     flattenProp('data'),
@@ -152,7 +164,8 @@ export default compose(
     withPropsOnChange(
 	['raceID'],
 	({race, raceMapColors: colors, raceWardStats: stats}) => ({
-	    candidates: race.candidates, 
+	    candidates: race.candidates,
+	    hasTurnoutData: stats.some( ({turnout}) => turnout > 0 ),
 	    zones: stats.map(
 		({ward, registeredVoters, turnout}) => [
 		    registeredVoters,
@@ -161,5 +174,9 @@ export default compose(
 		]
 	    )
 	})
+    ),
+    branch(
+	({hasTurnoutData}) => !hasTurnoutData,
+	renderComponent(NoDataModal)
     )
 )(CandidateScatterPlot)

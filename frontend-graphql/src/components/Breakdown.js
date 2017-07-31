@@ -112,22 +112,22 @@ const loadD3 = (data = []) => {
         
     });
 
-    console.log("wardData", wardData);
+    //console.log("wardData", wardData);
 
 
     //now let's get to drawing!!
     
     const stack = d3.stack()
 		    .keys(candidates);
-    console.log("stack", stack);
+  //  console.log("stack", stack);
 
     const stacked = stack(wardData);
-    console.log("stacked", stacked);
+    //console.log("stacked", stacked);
     const maxY = d3.max(stacked, function(d) {
         return d3.max(d, function(d) {
             return d[1];
         });
-    }); console.log("stacked keys", stacked[0][0].data);
+    }); //console.log("stacked keys", stacked[0][0].data);
 
     const margin = {top:10, right:10, bottom:90, left: 80};
     const width = 960 - margin.left - margin.right; 
