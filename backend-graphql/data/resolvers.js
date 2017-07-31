@@ -112,6 +112,15 @@ export default {
 	    }
 
 	    return db[queries[level]](race, zone)
-	}
+	},
+	breakdown: (_, {id, level}, {db}) => {
+            
+            const queries= {
+                WARD: 'race_ward_breakdown',
+                PRECINCT: 'race_precinct_breakdown'
+            }
+            
+            return db[queries[level]](id)
+        }
     }
 }

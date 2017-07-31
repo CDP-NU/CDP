@@ -69,6 +69,7 @@ type Query {
   raceWardStats(id: ID!): [WardStats]!
   geocode(street: String): Geocode
   zoneCandidateData(race: ID!, level: LEVEL, zone: Int): [CandidateZoneData]!
+  breakdown(id: ID!, level: LEVEL!): [JSON]
 }`
 
 const schema = makeExecutableSchema({ typeDefs, resolvers })
