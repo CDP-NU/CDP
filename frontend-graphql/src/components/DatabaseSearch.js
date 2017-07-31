@@ -78,7 +78,8 @@ const DatabaseSearch = ({
     onYearRangeChange,
     onKeywordTagClose,
     onElectionTagClose,
-    onOfficeTagClose
+    onOfficeTagClose,
+    onSearchResultClick
 }) => (
     <div className="database-search">
 	<div className="search-filters">
@@ -117,7 +118,8 @@ const DatabaseSearch = ({
 	     </div>
 	     : null}
 	</div>
-	<RaceMenu races={searchResults}/>
+	<RaceMenu races={searchResults}
+		  onSearchResultClick={onSearchResultClick}/>
     </div>
 )
 

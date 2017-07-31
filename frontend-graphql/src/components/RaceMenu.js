@@ -10,14 +10,15 @@ const CandidateMenuTitle = () => (
     </span>
 )
 
-const CandidateMenu = ({raceID, candidates}) => (
+const CandidateMenu = ({raceID, candidates, onSelect}) => (
     <Menu style={{width: '100%', display: 'block'}}
 	  mode="inline" selectedKeys={[]}>
 	<SubMenu key="sub1" title={<CandidateMenuTitle/>}>
 	    {candidates.map(
 		 ({name}, idx) => (
 		     <Menu.Item key={idx}>
-			 <Link to={`/race/${raceID}/maps/candidate/${idx + 1}/ward`}>{name}</Link>
+			 <Link to={`/race/${raceID}/maps/candidate/${idx + 1}/ward`}
+			       onClick={onSelect}>{name}</Link>
 		     </Menu.Item>
 		 )
 	     )}
@@ -32,9 +33,10 @@ export const RaceCard = ({
     year,
     office,
     electionType,
-    candidates
+    candidates,
+    onSelect
 }) => (
-    <Card title={<Link to={`/race/${id}/maps/ward`}>{`${name} - ${year}`}</Link>}
+    <Card title={<Link to={`/race/${id}/maps/ward`} onClick={onSelect}>{`${name} - ${year}`}</Link>}
 	  bodyStyle={{ padding: 0 }}>
 	<div style={{padding: '10px 16px'}}>
 	    <p>{date}</p>
@@ -42,14 +44,16 @@ export const RaceCard = ({
 	    <p>{office}</p>
 	</div>
 	<CandidateMenu raceID={id}
-		       candidates={candidates}/>
+		       candidates={candidates}
+		       onSelect={onSelect}/>
     </Card>
 )
 
-const RaceMenu = ({races = []}) => (
+const RaceMenu = ({races = [], onSearchResultClick}) => (
     <div>
 	{races.map(
-	     race => <RaceCard {...race}  key={race.id}/>
+	     race => <RaceCard {...race}  key={race.id}
+					  onSelect={onSearchResultClick}/>
 	 )}
     </div>
 )

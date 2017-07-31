@@ -1,4 +1,4 @@
-import { compose, mapProps, withStateHandlers, withProps } from 'recompose'
+import { compose, mapProps, withStateHandlers, withProps, withHandlers } from 'recompose'
 import { gql, graphql } from 'react-apollo'
 import DatabaseSearch from './DatabaseSearch'
 import withThrottledProps from './withThrottledProps'
@@ -42,6 +42,11 @@ export default compose(
 	    }),
 	    onOfficeTagClose: ({offices}) => name => ({
 		    offices: offices.filter( o => o !== name)
+	    }),
+	    resetSearch: () => () => ({
+		keyword: '',
+		elections: [],
+		office: []
 	    })
 	}
     ),
@@ -81,5 +86,17 @@ export default compose(
 	...props,
 	startYear: parseInt(startDate.substr(0, 4), 10),
 	endYear: parseInt(endDate.substr(0, 4), 10)
-    }))
+    })),
+    withHandlers({
+	onSearchResultClick: ({resetSearch}) => () => {
+	    
+	    const isMobile = window
+		.matchMedia("(max-width: 800px)")
+		.matches
+
+	    if(isMobile) {
+		resetSearch()
+	    }
+	}
+    })
 )(DatabaseSearch)
