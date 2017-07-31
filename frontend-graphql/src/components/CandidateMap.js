@@ -1,9 +1,9 @@
 import { gql, graphql } from 'react-apollo'
-import { compose, mapProps, branch, renderNothing, withPropsOnChange } from 'recompose'
+import { compose, mapProps, flattenProp, branch, renderNothing, withPropsOnChange } from 'recompose'
 import HeatMap from './HeatMap'
 
 const candidateMapQuery = gql`
-query CandidateMap($raceID: ID!, $candidateID: Int!, $level: LEVEL!) {
+query CandidateMap($raceID: ID!, $candidateID: Int!, $year: Int, $level: LEVEL!) {
     candidateMap(race: $raceID, candidate: $candidateID, level: $level) {
         colors
         stdcats {
@@ -12,24 +12,13 @@ query CandidateMap($raceID: ID!, $candidateID: Int!, $level: LEVEL!) {
             stdmax
         }
     }  
-}`
-
-const geojsonQuery = gql`
-query Geojson($year: Int!, $level: LEVEL!) {
     geojson(year: $year, level: $level)
 }`
 
 
 export default compose(
-    graphql(candidateMapQuery, {name: 'mapQuery'}),
-    graphql(geojsonQuery, {name: 'geoQuery'}),
-    mapProps( ({mapQuery, geoQuery, ...props}) => ({
-	...props,
-	...mapQuery,
-	...geoQuery,
-	loading: mapQuery.loading || geoQuery.loading,
-	error: mapQuery.error || geoQuery.error
-    })),
+    graphql(candidateMapQuery),
+    flattenProp('data'),
     branch(
 	({loading, error}) => loading || error,
 	renderNothing

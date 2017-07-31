@@ -6,7 +6,7 @@ import './css/Breakdown.css'
 
 //Ethan used square.github.io/intro-to-d3/examples for this!!
 
-const breakdownQuery =gql`
+const breakdownQuery = gql`
 query breakdown($raceID: ID!) {
     breakdown(id:$raceID, level: WARD)
     raceWardStats(id:$raceID) {

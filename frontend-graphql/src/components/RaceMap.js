@@ -1,27 +1,16 @@
 import { gql, graphql } from 'react-apollo'
-import { compose, mapProps, branch, renderNothing, withPropsOnChange } from 'recompose'
+import { compose, mapProps, branch, renderNothing, flattenProp, withPropsOnChange } from 'recompose'
 import HeatMap from './HeatMap'
 
 const raceMapQuery = gql`
-query RaceMap($raceID: ID!, $level: LEVEL!) {
+query RaceMap($raceID: ID!, $year: Int!, $level: LEVEL!) {
     raceMapColors(id: $raceID, level: $level)
-}`
-
-const geojsonQuery = gql`
-query Geojson($year: Int!, $level: LEVEL!) {
     geojson(year: $year, level: $level)
 }`
 
 export default compose(
-    graphql(raceMapQuery, {name: 'mapQuery'}),
-    graphql(geojsonQuery, {name: 'geoQuery'}),
-    mapProps( ({mapQuery, geoQuery, ...props}) => ({
-	...props,
-	...mapQuery,
-	...geoQuery,
-	loading: mapQuery.loading || geoQuery.loading,
-	error: mapQuery.error || geoQuery.error
-    })),
+    graphql(raceMapQuery),
+    flattenProp('data'),
     branch(
 	({loading, error}) => loading || error,
 	renderNothing
