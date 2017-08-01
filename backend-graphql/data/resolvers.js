@@ -1,7 +1,7 @@
-import { readFile } from 'fs'
-import { join } from 'path'
-import GraphQLJSON from 'graphql-type-json'
-import request from 'request-promise'
+const { readFile } = require('fs')
+const { join } = require('path')
+const GraphQLJSON = require('graphql-type-json')
+const request = require('request-promise')
 
 const getFile = path => new Promise(
     (resolve, reject) => {
@@ -43,7 +43,7 @@ async function geocode(street, db) {
 }
 
 
-export default {
+module.exports = {
     JSON: GraphQLJSON,
     Query: {
 	autocomplete: (_, {value}, {db}) => db

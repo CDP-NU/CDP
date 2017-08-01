@@ -1,8 +1,8 @@
-import express from 'express'
-import { graphqlExpress, graphiqlExpress } from 'graphql-server-express'
-import bodyParser from 'body-parser'
-import massive from 'massive'
-import schema from './data/schema'
+const express = require('express')
+const { graphqlExpress, graphiqlExpress } = require('graphql-server-express')
+const bodyParser = require('body-parser')
+const massive = require('massive')
+const schema = require('./data/schema')
 
 const connectionString = CDP_CONNECTION_STRING
 
