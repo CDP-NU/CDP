@@ -8,6 +8,10 @@ export default class MapGeojson extends React.Component {
 	map: PropTypes.object
     }
 
+    static defaultProps = {
+	onClick: () => {}
+    }
+
     componentDidMount() {
 	this.load()
     }
@@ -49,7 +53,7 @@ export default class MapGeojson extends React.Component {
     }
 
     render() {
-	return this.props.children
+	return this.props.children || null
     }
 
     componentWillUnmount() {

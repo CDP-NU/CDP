@@ -121,6 +121,9 @@ module.exports = {
             }
             
             return db[queries[level]](id)
-        }
+        },
+	demographyMap: (_, {id}, {db}) => db
+	    .demography_ward_map(id)
+	    .then( ([map]) => map ),
     }
 }

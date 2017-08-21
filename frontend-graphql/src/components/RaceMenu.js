@@ -36,12 +36,12 @@ export const RaceCard = ({
     candidates,
     onSelect
 }) => (
-    <Card title={<Link to={`/race/${id}/maps/ward`} onClick={onSelect}>{`${name} - ${year}`}</Link>}
+    <Card title={<Link to={`/race/${id}/maps/ward`} onClick={onSelect}>{`${office} - ${year}`}</Link>}
 	  bodyStyle={{ padding: 0 }}>
 	<div style={{padding: '10px 16px'}}>
 	    <p>{date}</p>
 	    <p>{electionType}</p>
-	    <p>{office}</p>
+	    <p>{name}</p>
 	</div>
 	<CandidateMenu raceID={id}
 		       candidates={candidates}

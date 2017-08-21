@@ -39,9 +39,20 @@ type Stdcat {
   stdmax: Int
 }
 
+type DemographyStdcat {
+  color: String
+  stdmin: Float
+  stdmax: Float
+}
+
 type CandidateMap {
   colors: JSON
   stdcats: [Stdcat]!
+}
+
+type DemographyMap {
+  colors: JSON
+  stdcats: [DemographyStdcat]!
 }
 
 type Geocode {
@@ -68,6 +79,7 @@ type Query {
   geocode(street: String): Geocode
   zoneCandidateData(race: ID!, level: LEVEL, zone: Int): [CandidateZoneData]!
   breakdown(id: ID!, level: LEVEL!): [JSON]
+  demographyMap(id: ID!): DemographyMap!
 }`
 
 const schema = makeExecutableSchema({ typeDefs, resolvers })

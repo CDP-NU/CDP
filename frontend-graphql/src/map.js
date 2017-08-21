@@ -21,6 +21,10 @@ class Map {
 	    zoomControl: false
 	})
 
+	L.control.zoom({
+	    position: 'topright'
+	}).addTo(this.map)
+
 	L.tileLayer(cartoUrl, {
 	    attribution: cartoAttribution,
 	    maxZoom: 16,
@@ -43,7 +47,7 @@ class Map {
 	})
     }
 
-    addGeojson({geojson, colors, zoneKey, onClick}) {
+    addGeojson({geojson, colors, zoneKey, onClick = () => {}}) {
 	
 	this.geojsonLayer = L.geoJson(geojson, {
 	    onEachFeature: (feature, layer) => {

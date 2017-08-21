@@ -35,6 +35,14 @@ const officeTags = [
     'Other'
 ]
 
+const demographyTags = [
+    'Race',
+    'Education',
+    'Housing',
+    'Percent in Poverty',
+    'Total Population'
+]
+
 
 const TagGroup = ({tags = [], selected = [], onSelectionChange}) => (
     <div>
@@ -68,6 +76,7 @@ const DatabaseSearch = ({
     keyword,
     elections,
     offices,
+    demographyCategories = [], //TODO: implement
     startYear,
     endYear,
     hasSubmittedSearch,
@@ -105,6 +114,12 @@ const DatabaseSearch = ({
 			<TagGroup tags={officeTags}
 				  selected={offices}
 				  onSelectionChange={onOfficeChange}/>
+		    </Card>
+		    <Card title="Demography Category"
+			  bordered={false}>
+			<TagGroup tags={demographyTags}
+				  selected={demographyCategories}
+				  onSelectionChange={() => {}}/>
 		    </Card>
 		</Panel>
 	    </Collapse>
