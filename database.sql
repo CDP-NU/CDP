@@ -7,8 +7,8 @@
 
 
 -- Extensions
-CREATE EXTENSION postgis
-CREATE EXTENSION pg_trgm
+CREATE EXTENSION postgis;
+CREATE EXTENSION pg_trgm;
 
 
 

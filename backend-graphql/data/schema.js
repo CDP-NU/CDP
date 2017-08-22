@@ -68,9 +68,14 @@ type CandidateZoneData {
   pct: Int
 }
 
+type SearchResult {
+  label: String
+  description: JSON
+}
+
 type Query {
   autocomplete(value: String): [String]!
-  search(keyword: String, start: String, end: String, elections: [String], offices: [String]): [Race]!
+  search(keyword: String, start: String, end: String, elections: [String], offices: [String], demographies: [String]): [SearchResult]!
   geojson(year: Int, level: LEVEL): JSON!
   race(id: ID!): Race!
   raceMapColors(id: ID!, level: LEVEL!): JSON!

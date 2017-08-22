@@ -4,18 +4,10 @@ import DatabaseSearch from './DatabaseSearch'
 import withThrottledProps from './withThrottledProps'
 
 const searchQuery = gql`
-query Search($keyword: String, $start: String!, $end: String!, $elections: [String]!, $offices: [String]!) {
-    search(keyword: $keyword, start: $start, end: $end, elections: $elections, offices: $offices) {
-	id
-	name
-	date
-	year
-	electionType
-	office
-	candidates {
-	    id
-	    name
-	}
+query Search($keyword: String, $start: String!, $end: String!, $elections: [String]!, $offices: [String]!, $demographies: [String]!) {
+    search(keyword: $keyword, start: $start, end: $end, elections: $elections, offices: $offices, demographies: $demographies) {
+        label
+        description
     }
 }`
 
@@ -26,22 +18,27 @@ export default compose(
 	    startDate: '2000/01/01',
 	    endDate: '2017/12/31',
 	    elections: [],
-	    offices: []
+	    offices: [],
+	    demographies: []
 	},
 	{
 	    onKeywordChange: () => keyword => ({keyword}),
-	    onElectionChange: () => elections => ({elections}),
-	    onOfficeChange: () => offices => ({offices}),
 	    onYearRangeChange: () => ([start, end]) => ({
 		startDate: `${start}/01/01`,
 		endDate: `${end}/12/31`
 	    }),
+	    onElectionChange: () => elections => ({elections}),
+	    onOfficeChange: () => offices => ({offices}),
+	    onDemographyChange: () => demographies => ({demographies}),
 	    onKeywordTagClose: () => () => ({keyword: ''}),
 	    onElectionTagClose: ({elections}) => name => ({
-		    elections: elections.filter( e => e !== name)
+		elections: elections.filter( e => e !== name )
 	    }),
 	    onOfficeTagClose: ({offices}) => name => ({
-		    offices: offices.filter( o => o !== name)
+		offices: offices.filter( o => o !== name )
+	    }),
+	    onDemographyTagClose: ({demographies}) => name => ({
+		demographies: demographies.filter( d=> d !== name )
 	    }),
 	    resetSearch: () => () => ({
 		keyword: '',
@@ -50,17 +47,19 @@ export default compose(
 	    })
 	}
     ),
-    withProps( ({keyword, elections, offices}) => ({
+    withProps( ({keyword, elections, offices, demographies}) => ({
 	hasSubmittedSearch: keyword ||
 			    elections.length ||
-			    offices.length
+			    offices.length ||
+			    demographies.length
     })),
     withThrottledProps(500, props => ({
 	throttledKeyword: props.keyword,
 	throttledStartDate: props.startDate,
 	throttledEndDate: props.endDate,
 	throttledElections: props.elections,
-	throttledOffices: props.offices
+	throttledOffices: props.offices,
+	throttledDemographies: props.demographies
     })),
     graphql(searchQuery, {
 	skip: ({hasSubmittedSearch}) => !hasSubmittedSearch,
@@ -70,7 +69,8 @@ export default compose(
 		start: props.throttledStartDate,
 		end: props.throttledEndDate,
 		elections: props.elections,
-		offices: props.throttledOffices
+		offices: props.throttledOffices,
+		demographies: props.throttledDemographies
 	    }
 	}),
 	props: ({ownProps, data: {search}}) => ({

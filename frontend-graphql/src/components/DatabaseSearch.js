@@ -1,7 +1,7 @@
 import React from 'react'
 import { Card, Tag, Collapse, Slider } from 'antd'
 import Autocomplete from './Autocomplete'
-import RaceMenu from './RaceMenu'
+import SearchResultMenu from './SearchResultMenu'
 
 const {Panel} = Collapse
 const {CheckableTag} = Tag
@@ -76,18 +76,20 @@ const DatabaseSearch = ({
     keyword,
     elections,
     offices,
-    demographyCategories = [], //TODO: implement
     startYear,
     endYear,
+    demographies = [], 
     hasSubmittedSearch,
     searchResults,
     onKeywordChange,
+    onYearRangeChange,
     onElectionChange,
     onOfficeChange,
-    onYearRangeChange,
+    onDemographyChange,
     onKeywordTagClose,
     onElectionTagClose,
     onOfficeTagClose,
+    onDemographyTagClose,
     onSearchResultClick
 }) => (
     <div className="database-search">
@@ -118,8 +120,8 @@ const DatabaseSearch = ({
 		    <Card title="Demography Category"
 			  bordered={false}>
 			<TagGroup tags={demographyTags}
-				  selected={demographyCategories}
-				  onSelectionChange={() => {}}/>
+				  selected={demographies}
+				  onSelectionChange={onDemographyChange}/>
 		    </Card>
 		</Panel>
 	    </Collapse>
@@ -130,11 +132,12 @@ const DatabaseSearch = ({
 		  null}
 		  {createRemovableTags(elections, onElectionTagClose)}
 		  {createRemovableTags(offices, onOfficeTagClose)}
+		  {createRemovableTags(demographies, onDemographyTagClose)}
 	     </div>
 	     : null}
 	</div>
-	<RaceMenu races={searchResults}
-		  onSearchResultClick={onSearchResultClick}/>
+	<SearchResultMenu results={searchResults}
+			  onResultClick={onSearchResultClick}/>
     </div>
 )
 

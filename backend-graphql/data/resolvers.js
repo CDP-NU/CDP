@@ -49,11 +49,11 @@ module.exports = {
 	autocomplete: (_, {value}, {db}) => db
 	    .autocomplete(value)
 	    .then( ([{autocompletions}]) => autocompletions),
-	search: (_, {keyword, start, end, elections, offices}, {db}) =>
+	search: (_, {keyword, start, end, elections, offices, demographies}, {db}) =>
 	    keyword ? db.search(
-		keyword, start, end, elections, offices
+		keyword, start, end, elections, offices, demographies
 	    ) : db.search_without_keyword(
-		start, end, elections, offices
+		start, end, elections, offices, demographies
 	    ),
 	race: (_, {id}, {db}) => db
 	    .race(id)
@@ -102,7 +102,7 @@ module.exports = {
 		__dirname,
 		`/boundary/${levelString}${yearString}.geojson`
 	    )) : null
-	} ,
+	},
 	geocode: (_, {street}, {db}) => geocode(street, db),
 	zoneCandidateData: (_, {race, level, zone}, {db}) => {
 

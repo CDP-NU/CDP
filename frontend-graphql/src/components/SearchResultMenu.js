@@ -49,13 +49,36 @@ export const RaceCard = ({
     </Card>
 )
 
-const RaceMenu = ({races = [], onSearchResultClick}) => (
+const DemographyCard = ({
+    measure,
+    category,
+    onSelect
+}) => (
+    <Card title={<Link to={`/demography/${measure}`} onClick={onSelect}>{`${measure}`}</Link>}
+	  bodyStyle={{ padding: 0 }}>
+	<div style={{padding: '10px 16px'}}>
+	    <p>{category}</p>
+	</div>
+    </Card>
+)
+
+const cards = {
+    RACE: (race, onSelect) => (
+	<RaceCard {...race}  key={race.id}
+			     onSelect={onSelect}/>
+    ),
+    DEMOGRAPHY: (demography, onSelect) => (
+	<DemographyCard {...demography} key={demography.measure}
+					onSelect={onSelect}/>
+    )
+}
+
+const SearchResultMenu = ({results = [], onResultClick}) => (
     <div>
-	{races.map(
-	     race => <RaceCard {...race}  key={race.id}
-					  onSelect={onSearchResultClick}/>
+	{results.map(
+	     ({label, description}) => cards[label](description, onResultClick)
 	 )}
     </div>
 )
 
-export default withRouter(RaceMenu)
+export default withRouter(SearchResultMenu)
