@@ -35,10 +35,16 @@ const App = () => (
     <div>
 	<div className="sidebar">
 	    <div className="sidebar_header">
-		<a className="home-btn" href="http://cdp.northwestern.edu">
-		    <img className="home-btn_logo" src={cdp}/>
+		<a className="home-btn"
+		   href="http://cdp.northwestern.edu">
+		    <img className="home-btn_logo"
+			 src={cdp}/>
 		</a>
 		<h3>Browse Database</h3>
+		<a className="sidebar_help-btn"
+		   href="http://cdp.northwestern.edu/index.php/chicago-elections-database-help">
+		    Help
+		</a>
 	    </div>
 	    <DatabaseSearchContainer/>
 	</div>

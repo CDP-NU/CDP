@@ -4,8 +4,7 @@ const bodyParser = require('body-parser')
 const massive = require('massive')
 const schema = require('./data/schema')
 
-const connectionString = CDP_CONNECTION_STRING
-
+const connectionString = 'postgres://mac_user_name:mac_password@localhost/election'
 
 massive({connectionString}).then( db => {
 
@@ -20,6 +19,12 @@ massive({connectionString}).then( db => {
     
     graphQLServer.use('/graphiql', graphiqlExpress({ endpointURL: '/graphql' }))
 
+    /*** IN PRODUCTION **/
+    //graphQLServer.get('*', (req, res) => {
+    //    res.sendFile(path.join(__dirname, './public/index.html'))
+    //})
+   
+    
     graphQLServer.listen(GRAPHQL_PORT, () => console.log(
 	`GraphiQL is now running on http://localhost:${GRAPHQL_PORT}/graphiql`
     ))
