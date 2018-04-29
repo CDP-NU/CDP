@@ -1,9 +1,9 @@
+
 .axis path, .axis line {
     fill: none;
-    // stroke: #fff;
 }
 .axis text {
-    font-size: 15px;
+    font-size: 13px;
 }
 .bar {
     fill: rgba(0, 66, 128, 0.25);
@@ -17,7 +17,7 @@ svg text.label {
     font-weight: 400;
     text-anchor: middle;
 }
-#breakdown{
+#scatterplot{
     min-height: 400px;
     min-width: 925px;
     width: 75%;
@@ -42,12 +42,11 @@ svg text.label {
     stroke-width: 0;
 }
 
-/*To be added in from App.css*/
-
 .scatter-plot_legend {
     line-height: 18px;
     color: #555;
     flex-shrink: 0;
+    padding: 20px;
     float: right;
 }
 
@@ -73,8 +72,16 @@ svg text.label {
     left: 0;
     width: 100%;
 }
-
-#breakdown_wrap {
-    min-width: 925px;
-    display: inline-block;
+div.tooltip {
+    position: absolute;
+    text-align: center;
+    width: 150px;
+    padding: 2px;
+    font: 12px sans-serif;
+    background: lightsteelblue;
+    border: 0px;
+    border-radius: 8px;
+    pointer-events: none;
 }
+
+

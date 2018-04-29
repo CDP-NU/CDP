@@ -1,6 +1,6 @@
 import React from 'react'
 import { Redirect } from 'react-router-dom'
-import { Breadcrumb, Radio } from 'antd'
+import { Breadcrumb, Radio, Checkbox } from 'antd'
 import { gql, graphql } from 'react-apollo'
 import { compose, mapProps, withHandlers, branch, renderComponent } from 'recompose'
 const RadioButton = Radio.Button

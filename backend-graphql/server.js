@@ -4,7 +4,7 @@ const bodyParser = require('body-parser')
 const massive = require('massive')
 const schema = require('./data/schema')
 
-const connectionString = 'postgres://mac_user_name:mac_password@localhost/election'
+const connectionString = 'postgres://postgres:144230@localhost/election5'
 
 massive({connectionString}).then( db => {
 

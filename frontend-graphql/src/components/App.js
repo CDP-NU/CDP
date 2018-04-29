@@ -9,6 +9,7 @@ import DatabaseSearchContainer from './DatabaseSearchContainer'
 import TopBar from './TopBar'
 import Map from './Map'
 import cdp from './cdp.png'
+import ComparePage from './ComparePage'
 
 class NoMatch extends React.Component {
 
@@ -60,6 +61,8 @@ const App = () => (
 		       component={MapPageContainer}/>
 		<Route path="/race/:raceID/graphs/:graph"
 		       component={GraphPage}/>
+                <Route path="/race/:raceID/compare/:raceID2/:compare"
+                       component={ComparePage} />
 		<Route path="/demography/:id"
 		       render={ ({match: {params}}) => (
 			      <DemographyMap id={params.id}/>

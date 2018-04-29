@@ -1,5 +1,5 @@
 import React from 'react'
-import { Card, Tag, Collapse, Slider } from 'antd'
+import { Card, Tag, Collapse, Slider, Checkbox} from 'antd'
 import Autocomplete from './Autocomplete'
 import SearchResultMenu from './SearchResultMenu'
 
@@ -72,6 +72,7 @@ const createRemovableTags = (tags, onClose) => tags.map(
     )
 )
 
+
 const DatabaseSearch = ({
     keyword,
     elections,
@@ -90,14 +91,17 @@ const DatabaseSearch = ({
     onElectionTagClose,
     onOfficeTagClose,
     onDemographyTagClose,
-    onSearchResultClick
+    onSearchResultClick,
+    onCompareChange,
+    compare
 }) => (
     <div className="database-search">
 	<div className="search-filters">
 	    <Autocomplete onSearch={onKeywordChange}/>
 	    <Collapse style={{width: '100%'}}>
-		<Panel header="Search Tools"
+                <Panel header="Search Tools"
 		       key="1">
+                <Checkbox style={{ textAlign: 'right', marginLeft: '15em', position: 'absolute'}} onChange={onCompareChange}>Compare</Checkbox>
 		    <h4>Year Range</h4>
 		    <p>{`${startYear} - ${endYear}`}</p>
 		    <Slider range
@@ -137,6 +141,7 @@ const DatabaseSearch = ({
 	     : null}
 	</div>
 	<SearchResultMenu results={searchResults}
+                          compare={compare}
 			  onResultClick={onSearchResultClick}/>
     </div>
 )

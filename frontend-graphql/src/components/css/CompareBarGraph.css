@@ -3,7 +3,7 @@
     // stroke: #fff;
 }
 .axis text {
-    font-size: 15px;
+    font-size: 12px;
 }
 .bar {
     fill: rgba(0, 66, 128, 0.25);
@@ -17,13 +17,19 @@ svg text.label {
     font-weight: 400;
     text-anchor: middle;
 }
-#breakdown{
+#CompareBarGraph_race1{
     min-height: 400px;
     min-width: 925px;
     width: 75%;
     float: left;
 }
 
+#CompareBarGraph_race2{
+    min-height: 400px;
+    min-width: 925px;
+    width: 75%;
+    float: left;
+}
 
 
 .line {
@@ -43,6 +49,10 @@ svg text.label {
 }
 
 /*To be added in from App.css*/
+
+.race2 {
+    filter: invert(100%)
+}
 
 .scatter-plot_legend {
     line-height: 18px;
@@ -74,7 +84,3 @@ svg text.label {
     width: 100%;
 }
 
-#breakdown_wrap {
-    min-width: 925px;
-    display: inline-block;
-}

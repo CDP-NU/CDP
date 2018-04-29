@@ -19,7 +19,8 @@ export default compose(
 	    endDate: '2017/12/31',
 	    elections: [],
 	    offices: [],
-	    demographies: []
+	    demographies: [],
+            compare: false
 	},
 	{
 	    onKeywordChange: () => keyword => ({keyword}),
@@ -40,6 +41,8 @@ export default compose(
 	    onDemographyTagClose: ({demographies}) => name => ({
 		demographies: demographies.filter( d=> d !== name )
 	    }),
+            onCompareChange: ({compare}) => value => ({
+                compare: value.target.checked}),
 	    resetSearch: () => () => ({
 		keyword: '',
 		elections: [],
@@ -47,11 +50,12 @@ export default compose(
 	    })
 	}
     ),
-    withProps( ({keyword, elections, offices, demographies}) => ({
+    withProps( ({keyword, elections, offices, demographies, compare}) => ({
 	hasSubmittedSearch: keyword ||
 			    elections.length ||
 			    offices.length ||
-			    demographies.length
+			    demographies.length ||
+                            compare
     })),
     withThrottledProps(500, props => ({
 	throttledKeyword: props.keyword,

@@ -1,18 +1,20 @@
 # Chicago Democracy Project Database
 
-
-
 ## Mac Installation
 
 [Install postgres](https://postgresapp.com/)
+Place the election dump in (usually a .bak file) in an easy to access directory. [This is a generally useful link for help.](https://www.codementor.io/engineerapart/getting-started-with-postgresql-on-mac-osx-are8jcopb)
+Postgres is funky.  When you install it, there will be a default database called 'postgres' created AND a default role (in other words, a username) called 'postgres.'  Create a local username
+In bash, run the command `pg_restore -C -d postgres election_dump.bak`, where `election_dump.bak` is the dump file of the database. This command opens postgres databse 'postgres' and then creates a new database named election5 or whatever was specificed in the dump.  This is crucial.
 
 [Install Node and NPM](http://blog.teamtreehouse.com/install-node-js-npm-mac)
 
 `git clone https://github.com/cory17/CDP.git`
 
-Navigate to CDP/frontend and enter `npm install`. Then,
-navigate to CDP/backend and enter `npm install` again
+Navigate to CDP/frontend-graphql and enter `npm install`. Then,
+navigate to CDP/backend-graphql and enter `npm install` again
 
+Navigate to CDP/backend-graphql/server.js and change the connectionString to be in the format: `const connectionString = 'postgres://[username]:[password]@localhost/[database name]'`.  Mine looks like `postgres://postgress:[my password]@localhost/election5`.
 
 ## Running locally
 

@@ -10,6 +10,7 @@ const CandidateMenuTitle = () => (
     </span>
 )
 
+//For later: build in the link level compare functionality for the candidate menu
 const CandidateMenu = ({raceID, candidates, onSelect}) => (
     <Menu style={{width: '100%', display: 'block'}}
 	  mode="inline" selectedKeys={[]}>
@@ -26,6 +27,8 @@ const CandidateMenu = ({raceID, candidates, onSelect}) => (
     </Menu>
 )
 
+const CompareLink = (id, race1, compare) => ((compare === true ) && (race1 !== undefined)) ? `/race/${race1}/compare/${id}/compare_bargraph` : `/race/${id}/maps/ward`
+
 export const RaceCard = ({
     id,
     name,
@@ -34,9 +37,11 @@ export const RaceCard = ({
     office,
     electionType,
     candidates,
-    onSelect
+    onSelect,
+    compare,
+    race1 
 }) => (
-    <Card title={<Link to={`/race/${id}/maps/ward`} onClick={onSelect}>{`${office} - ${year}`}</Link>}
+    <Card title={<Link to={CompareLink(id, race1, compare)} onClick={onSelect}>{`${office} - ${year}`}</Link>}
 	  bodyStyle={{ padding: 0 }}>
 	<div style={{padding: '10px 16px'}}>
 	    <p>{date}</p>
@@ -52,7 +57,8 @@ export const RaceCard = ({
 const DemographyCard = ({
     measure,
     category,
-    onSelect
+    onSelect,
+    compare
 }) => (
     <Card title={<Link to={`/demography/${measure}`} onClick={onSelect}>{`${measure}`}</Link>}
 	  bodyStyle={{ padding: 0 }}>
@@ -63,20 +69,21 @@ const DemographyCard = ({
 )
 
 const cards = {
-    RACE: (race, onSelect) => (
-	<RaceCard {...race}  key={race.id}
-			     onSelect={onSelect}/>
+    RACE: (race, onSelect, compare) => (
+	<RaceCard {...race}  key={race.id} compare={compare} race1={window.location.pathname.split("/")[3]} 			     
+        onSelect={onSelect}/>
+
     ),
-    DEMOGRAPHY: (demography, onSelect) => (
-	<DemographyCard {...demography} key={demography.measure}
+    DEMOGRAPHY: (demography, onSelect, compare) => (
+	<DemographyCard {...demography} key={demography.measure} compare={compare}
 					onSelect={onSelect}/>
     )
 }
 
-const SearchResultMenu = ({results = [], onResultClick}) => (
+const SearchResultMenu = ({results = [], onResultClick, compare}) => (
     <div>
 	{results.map(
-	     ({label, description}) => cards[label](description, onResultClick)
+	     ({label, description}) => cards[label](description, onResultClick, compare)
 	 )}
     </div>
 )
