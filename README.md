@@ -1,21 +1,64 @@
 # Schematic of CDP website
-## by Ethan Roubenoff, 14 August 2017
+## by Ethan Roubenoff
+### Drafts 14 August 2017, 29 April 2018
 
-This is a general schematic of the CDP website as it stands 
+This is a general schematic of the CDP website as it stands.
+
+## Mac Installation Instructions
+
+[Install postgres](https://postgresapp.com/)
+Place the election dump in (usually a .bak file) in an easy to access directory. [This is a generally useful link for help.](https://www.codementor.io/engineerapart/getting-started-with-postgresql-on-mac-osx-are8jcopb)
+Postgres is funky.  When you install it, there will be a default database called 'postgres' created AND a default role (in other words, a username) called 'postgres.'  Create a local username (usually postgres)
+In bash, run the command `pg_restore -C -d postgres election_dump.bak`, where `election_dump.bak` is the dump file of the database. This command opens postgres databse 'postgres' and then creates a new database named election5 or whatever was specificed in the dump.  This is crucial.
+
+[Install Node and NPM](http://blog.teamtreehouse.com/install-node-js-npm-mac)
+
+Navigate to a new folder and enter the command: `git pull <https://github.com/CDP-NU/CDP.git>` 
+
+Navigate to CDP/frontend-graphql and enter `npm install`. Then, navigate to CDP/backend-graphql and enter `npm install` again.  You may need to run a `npm update -i` but be very careful regarding dependencies.
+
+Navigate to CDP/backend-graphql/server.js and change the connectionString to be in the format: `const connectionString = 'postgres://[username]:[password]@localhost/[database name]'`.  Mine looks like `postgres://postgress:[my password]@localhost/election5`.  This is dependent on how you have the database configured.
+
+## Running locally
+
+Open Google Chrome and postgres. Then, navigate to CDP/backend-graphql and enter `nodemon start`. Next, open a new terminal tab/window and navigate to CDP/frontend-graphql. Enter `nodemon start`. Google Chrome should begin loading the site.  You need to keep both of these windows opwn.  Note, nodemon is a npm plugin that reboots the server when anything changes.  I find it very useful.
+
+
+## Creating a production build
+
+The frontend uses [create-react-app-antd](https://github.com/ant-design/create-react-app-antd). This boilerpate is based on https://github.com/facebookincubator/create-react-app and provides hot-module-reloading, linting, minification, autoprefixer, webpack, babel, and other nice development tools. 
+
+On your local machine, run the following commands: 
+1. run `cd CDP/frontend-graphql`
+2. run `npm run build`
+3. run `mv build CDP/backend-graphql/public`
+4. In `CDP/backend-graphql/server.js`:
+ - Change the `connectionString` to `postgres://cdp:lakefill@localhost:5432/election5`
+ - Uncomment the lines underneath `/*** IN PRODUCTION ***/`
+ - Remove `CDP/backend-graphql/node_modules` if it exists
+5. Move `CDP/backend-graphql` to the server. It doesn’t matter where the folder is put. The current version is under `shared/cdpnext2`
+6. `ssh ` into the server and `cd` into the folder
+7. run `npm install`
+8. run `forever stopall`
+9. run `NODE_ENV=production forever start server.js`
 
 ## Frontend
 
 #### A note on Higher Order Components (HOCs)
 This was one of the hardest parts of the website for me to understand, so I'm going to go into very elaborate detail here. HOCs allow for modularity, which is the key funciton of React.  We could just as easily explicitly call a component, but the React ideology is all about modularity, so we do this.
 
-HOCs follow the general formula: `compose(some modifiers)(Base component) = HOC`.  Let's say we have a very simple base component, like such:
-   `const BaseComponent = ({prop1, prop2}) => {console.log(prop1, prop2) return null}`
+Our implimentation of HOCs follow the general formula: `compose(some modifiers)(Base component) = HOC`.  Let's say we have a very simple base component, like such:
+   ```javascript
+   const BaseComponent = ({prop1, prop2}) => {console.log(prop1, prop2) return null}
+   ```
    This component is a function, named BaseComponent, that takes in two props as arguments, prints them to the console, then returns null.  
    In order to correctly execute BaseComponent, we 'compose' it:
-   `compose(
+   ```javascript
+   compose(
         mapProps(({prop1, prop2}) => {return {prop1, prop2}
         })
-    )(BaseComponent)`
+    )(BaseComponent)
+    ```
    What this is effectively doing is taking `prop1` and `prop2` of the parent component and passing them as `prop1` and `prop2` to the BaseComponent.
 
 For a more in depth explaination, let's take `GraphPage.js` as an example, which is called once by `App.js` (see below for how that is called).  The base component here is called ScatterPlotPage, which takes arguments `({raceID, graph, onGraphChange})`, and returns a `<div className="scatter-plot_page" />`.  
@@ -26,18 +69,18 @@ You can see in the rest of ScatterPlotPage what these arguments do: `raceID` is 
 Right now, you could call ScatterPlotPage with the arguments `{raceID:0, graph:lorenzCurve, onGraphChange:changeToLorenzCurve}`, and when the lorenzCurve option is selected from the dropdown menu, a lorenzCurve would be generated with raceID=0.
 
 However, the next chunk of code: 
-    `
-    export default compose(
-        mapProps(({match: {params}, ...props}) => ({
-            ...props,
-            ...params,
-        })),
-        withHandlers({
-            onGraphChange: ({raceID, history}) => graph =>
-                history.push(`/race/${raceID}/graphs/${graph}`)
-        })
-    )(ScatterPlotPage)
-    `
+```javascript
+export default compose(
+    mapProps(({match: {params}, ...props}) => ({
+        ...props,
+        ...params,
+    })),
+    withHandlers({
+        onGraphChange: ({raceID, history}) => graph =>
+            history.push(`/race/${raceID}/graphs/${graph}`)
+    })
+)(ScatterPlotPage)
+```
 Is where things get interesting.  There are two things going on here: we're mapping props from the parent component with `mapProps` and defining function handlers `withHandlers`-- a fancy word for callback functions.  Let's break them down.
 - `mapProps(...)` takes arguments `({match: {params}, ...props})` and returns `({...props, ...prarams})`.  Think of `...` as just meaning 'all of them'-- so return every prop and every param.  When App.js calls ScatterPlotPage, this function takes App's `match` prop, finds all of match's `param` props, and all the rest of the props inApp, and passes them with the same name to ScatterPlotPage.
 -  `withHandlers(onGraphChange: (...))` defines the onGraphChange callback we discussed above.  It takes the `raceID` and `history` props and the `graph` value and pushes a new URL with those variables.

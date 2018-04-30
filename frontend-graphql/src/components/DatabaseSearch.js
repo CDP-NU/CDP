@@ -101,7 +101,7 @@ const DatabaseSearch = ({
 	    <Collapse style={{width: '100%'}}>
                 <Panel header="Search Tools"
 		       key="1">
-                <Checkbox style={{ textAlign: 'right', marginLeft: '15em', position: 'absolute'}} onChange={onCompareChange}>Compare</Checkbox>
+                <Checkbox style={{ textAlign: 'right', marginLeft: '20em', marginTop: '10px', position: 'absolute',  zIndex: '1'}} onChange={onCompareChange}>Compare</Checkbox>
 		    <h4>Year Range</h4>
 		    <p>{`${startYear} - ${endYear}`}</p>
 		    <Slider range

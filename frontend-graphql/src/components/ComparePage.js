@@ -27,7 +27,7 @@ const ComparePage = ({raceID, raceID2, compare, handleChange}) => (
     <div>
         <div id="compare_select">
             <Select 
-                style={{width:250, margin:'10px'}}
+                style={{width:250, topMargin:'10px'}}
                 defaultValue="compare_bargraph"
                 onChange={handleChange}>
                 <Option value="compare_bargraph">Compare Bar Graph</Option>

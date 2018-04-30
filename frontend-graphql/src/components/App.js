@@ -1,6 +1,6 @@
 import React from 'react'
 import { Switch, Route } from 'react-router-dom'
-import { Modal } from 'antd'
+import { Modal, Button, Checkbox} from 'antd'
 import './css/App.css'
 import MapPageContainer from './MapPageContainer'
 import DemographyMap from './DemographyMap'
@@ -31,6 +31,8 @@ const DemographyTopBar = ({
 	<h3>{title}</h3>
     </div>
 )
+
+
 
 const App = () => (
     <div>
@@ -82,3 +84,4 @@ const App = () => (
 )
 
 export default App
+
