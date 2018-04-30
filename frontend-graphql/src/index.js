@@ -10,7 +10,7 @@ import enUS from 'antd/lib/locale-provider/en_US'
 /* Development */
 const client = new ApolloClient()
 
-/* Production 
+/*
 const client = new ApolloClient({
     networkInterface: createNetworkInterface({
 	uri: 'http://cdp.northwestern.edu/database/graphql'

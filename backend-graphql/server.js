@@ -4,7 +4,7 @@ const bodyParser = require('body-parser')
 const massive = require('massive')
 const schema = require('./data/schema')
 
-const connectionString = 'postgres://postgres:144230@localhost/election5'
+const connectionString = 'postgres://eroubenoff:144230@localhost:5432/election5'
 
 massive({connectionString}).then( db => {
 
@@ -20,9 +20,9 @@ massive({connectionString}).then( db => {
     graphQLServer.use('/graphiql', graphiqlExpress({ endpointURL: '/graphql' }))
 
     /*** IN PRODUCTION **/
-    //graphQLServer.get('*', (req, res) => {
-    //    res.sendFile(path.join(__dirname, './public/index.html'))
-    //})
+    graphQLServer.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, './public/index.html'))
+    })
    
     
     graphQLServer.listen(GRAPHQL_PORT, () => console.log(
