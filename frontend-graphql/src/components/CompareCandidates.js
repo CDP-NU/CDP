@@ -9,7 +9,8 @@ import { Switch, Route } from 'react-router-dom'
 
 
 const scatterPlotQuery = gql`
-query ScatterPlot($raceID: ID!) {
+query ScatterPlot($raceID: ID!, $selectedCandidate_race1: Int!)
+ {
     race(id: $raceID) {
         id
 	candidates {
@@ -18,16 +19,16 @@ query ScatterPlot($raceID: ID!) {
 	    color
             pct
 	}
-    }
-    raceMapColors(id: $raceID, level: WARD)
-    raceWardStats(id: $raceID) {
-	ward
-	registeredVoters
-	turnout
-    }
+        electionType
+        office
+        date
+        year
+        name
+    }      
+    compareCandidate(id: $raceID, candidate: $selectedCandidate_race1)
 }`
 const scatterPlotQuery2 = gql`
-query ScatterPlot($raceID2: ID!) {
+query ScatterPlot($raceID2: ID!, $selectedCandidate_race2: Int!) {
     race(id: $raceID2) {
         id
 	candidates {
@@ -37,16 +38,21 @@ query ScatterPlot($raceID2: ID!) {
             pct
 	}
     }
-    raceMapColors(id: $raceID2, level: WARD)
-    raceWardStats(id: $raceID2) {
-	ward
-	registeredVoters
-	turnout
-    }
+    compareCandidate(id: $raceID2, candidate: $selectedCandidate_race2)
 }`
 
 const loadD3 = (race1, race2) => {
+
+    console.log(race1, race2)
+    // Only displays dots where a candidates is voted for in that ward for both elections.  Future version could include other wards
+    const wards = _.intersection(race1.compareCandidate.map(item=>item.ward), race2.compareCandidate.map(item=>item.ward))
+    const data = 
+        _.map(wards, w => {return { ward:w,
+                                    r1:_.findWhere(race1.compareCandidate, {ward:w}).pct, 
+                                    r2:_.findWhere(race2.compareCandidate, {ward:w}).pct
+        }})
     
+
     const margin = {top: 20, right: 15, bottom: 60, left: 60}
     const width = 960 - margin.left - margin.right
     const height = 500 - margin.top - margin.bottom
@@ -56,11 +62,11 @@ const loadD3 = (race1, race2) => {
     
 
     const x = d3.scaleLinear()
-                .domain([0, d3.max([ d3.max(race1, d => d[0]), d3.max(race2, d => d[0])])])
+                .domain([0, 100])
                 .range([0, width])
 
     const y = d3.scaleLinear()
-                .domain([0, d3.max([ d3.max(race1, d => d[1]), d3.max(race2, d => d[1])])])
+                .domain([0, 100])
                 .range([height, 0])
 
     const scatterplot = d3.select('#scatterplot')
@@ -94,7 +100,7 @@ const loadD3 = (race1, race2) => {
     main.append("text")             
 		    .attr('transform', `translate(${width/2}, ${height + margin.top + 20})`)
 		    .style('text-anchor', 'middle')
-		    .text('Registered voters in each ward');
+		    .text('Candidate: ' + race1.compareCandidate[0]["name"] + ", Race: " + race1.race.name + ", Date: " + race1.race.date);
 
 
     const yAxis = d3.axisLeft()
@@ -106,7 +112,7 @@ const loadD3 = (race1, race2) => {
 		    .attr('x', 0 - (height / 2))
 		    .attr('dy', '1em')
 		    .style('text-anchor', 'middle')
-		    .text('Turnout Percentage');     
+		    .text('Candidate: ' + race2.compareCandidate[0]["name"] + ", Race: " + race2.race.name + ", Date: " + race2.race.date);
 
     main.append('g')
 	.attr('transform', 'translate(0,0)')
@@ -121,11 +127,11 @@ const loadD3 = (race1, race2) => {
     .style("opacity", 0);
 
     g.selectAll('scatter-dots')
-     .data(race1)
+     .data(data)
      .enter().append('svg:circle')
-     .attr('cx', d => x(d[0]))
-     .attr('cy', d => y(d[1]))
-     .attr('fill', d => d[2])
+     .attr('cx', d => x(d.r1))
+     .attr('cy', d => y(d.r2))
+     .attr('fill', 'black')
      .attr('r', 8)
     .on("mouseover", d => {
             tooltip.transition()
@@ -140,31 +146,6 @@ const loadD3 = (race1, race2) => {
                 .duration(500)
                 .style("opacity", 0);
         })
-
-    g.selectAll('scatter-dots')
-     .data(race2)
-     .enter().append('svg:circle')
-     .attr('cx', d => x(d[0]))
-     .attr('cy', d => y(d[1]))
-     .attr('fill', d => d[2])
-     .attr("stroke-width", 4)
-     .attr("stroke", "black")
-     .attr('r', 8)
-    .on("mouseover", d => {
-            tooltip.transition()
-                .duration(200)
-                .style("opacity", .9);
-            tooltip.html("Ward: " + d[3] + "<br/>" + "Registered Voters: " + d[0] + "<br>" +  "Turnout Pct: " + Math.floor(d[1]) + "%") 
-                .style("left", (d3.event.pageX) + "px")
-                .style("top", (d3.event.pageY - 28) + "px");
-            })
-        .on("mouseout", function(d) {
-            tooltip.transition()
-                .duration(500)
-                .style("opacity", 0);
-        })
-
-
 }
 
 
@@ -172,12 +153,12 @@ const loadD3 = (race1, race2) => {
 class CompareCandidates extends React.Component {
 
     componentDidMount() {
-	loadD3(this.props.points_race1, this.props.points_race2)
+	loadD3(this.props.race1, this.props.race2)
     }
 
     componentWillReceiveProps(next) {
-	if((this.props.points_race1 !== next.points_race1) || (this.props.points_race2 !== next.points_race2) ) {
-	    loadD3(next.points_race1, next.points_race2)
+	if((this.props.race1.compareCandidate !== next.race1.compareCandidate) || (this.props.race2.compareCandidate !== next.race2.compareCandidate) ) {
+	    loadD3(next.race1.compareCandidate, next.race2.compareCandidate)
 	}
     }
     
@@ -195,8 +176,10 @@ class CompareCandidates extends React.Component {
 }
 
 export default compose(
-    mapProps(({...props})=> {
+    mapProps(({raceID, raceID2, ...props})=> {
 	return {
+            raceID,
+            raceID2,
             ...props,
 	}
     }),

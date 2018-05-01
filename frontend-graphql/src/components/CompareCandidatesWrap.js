@@ -20,12 +20,6 @@ query ScatterPlot($raceID: ID!) {
             pct
 	}
     }
-    raceMapColors(id: $raceID, level: WARD)
-    raceWardStats(id: $raceID) {
-	ward
-	registeredVoters
-	turnout
-    }
 }`
 const scatterPlotQuery2 = gql`
 query ScatterPlot($raceID2: ID!) {
@@ -37,12 +31,6 @@ query ScatterPlot($raceID2: ID!) {
 	    color
             pct
 	}
-    }
-    raceMapColors(id: $raceID2, level: WARD)
-    raceWardStats(id: $raceID2) {
-	ward
-	registeredVoters
-	turnout
     }
 }`
 
@@ -59,9 +47,13 @@ const CompareCandidatesWrap = ({
     url,
     history }) => (
     <div className="scatter-plot_wrap">
-	<CompareCandidates race1={race1} race2={race2} 
+
+	<CompareCandidates 
+                    raceID={raceID} 
+                    raceID2={raceID2} 
                     selectedCandidate_race1={selectedCandidate_race1}
                     selectedCandidate_race2={selectedCandidate_race2}/>
+
                 <CandidatesSelect url={url}
 		    history={history}
 		    race1={race1}
@@ -102,22 +94,6 @@ export default compose(
             return {
 	    race1_candidates: race1.race.candidates, 
 	    race2_candidates: race2.race.candidates, 
-	    race1_zones: race1.raceWardStats.map(
-		({ward, registeredVoters, turnout}) => [
-		    registeredVoters,
-		    turnout * 100,
-		    race1.raceMapColors[ward] ? race1.raceMapColors[ward] : '#fff',
-                    ward
-		]
-	    ),
-	    race2_zones: race2.raceWardStats.map(
-		({ward, registeredVoters, turnout}) => [
-		    registeredVoters,
-		    turnout * 100,
-		    race2.raceMapColors[ward] ? race2.raceMapColors[ward] : '#fff', 
-                    ward
-		]
-	    )
 	}}
     )
 )(CompareCandidatesWrap)
