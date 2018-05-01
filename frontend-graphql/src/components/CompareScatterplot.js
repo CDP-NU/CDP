@@ -17,6 +17,7 @@ query ScatterPlot($raceID: ID!) {
 	    id
 	    name
 	    color
+            pct
 	}
     }
     raceMapColors(id: $raceID, level: WARD)
@@ -34,6 +35,7 @@ query ScatterPlot($raceID2: ID!) {
 	    id
 	    name
 	    color
+            pct
 	}
     }
     raceMapColors(id: $raceID2, level: WARD)
