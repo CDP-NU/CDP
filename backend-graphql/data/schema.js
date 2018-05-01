@@ -85,6 +85,7 @@ type Query {
   zoneCandidateData(race: ID!, level: LEVEL, zone: Int): [CandidateZoneData]!
   breakdown(id: ID!, level: LEVEL!): [JSON]
   demographyMap(id: ID!): DemographyMap!
+  compareCandidate(id: ID!, candidate: Int!):  JSON!
 }`
 
 const schema = makeExecutableSchema({ typeDefs, resolvers })

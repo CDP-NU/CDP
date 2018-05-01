@@ -7,7 +7,7 @@ import './css/CompareRaces.css'
 import { Switch, Route, matchPath } from 'react-router-dom'
 import CompareBreakdown from './CompareBreakdown'
 import CompareBarGraph from './CompareBarGraph'
-import CompareScatterplot from './CompareScatterplot'
+import CompareCandidatesWrap from './CompareCandidatesWrap'
 
 const compareQuery=gql`
 query compare($raceID: ID!) {
@@ -23,7 +23,7 @@ query compare($raceID: ID!) {
 
 const Option = Select.Option
 
-const ComparePage = ({raceID, raceID2, compare, handleChange}) => (
+const ComparePage = ({raceID, raceID2, compare, handleChange, history}) => (
     <div>
         <div id="compare_select">
             <Select 
@@ -41,8 +41,8 @@ const ComparePage = ({raceID, raceID2, compare, handleChange}) => (
                    render={() => <CompareBarGraph raceID={raceID} raceID2={raceID2} />}/> 
                 <Route path="/race/:raceID/compare/:raceID2/compare_breakdown"
                    render={() => <CompareBreakdown raceID={raceID} raceID2={raceID2} />}/> 
-                <Route path="/race/:raceID/compare/:raceID2/compare_scatterplot"
-                   render={() => <CompareScatterplot raceID={raceID} raceID2={raceID2} />}/> 
+                <Route path="/race/:raceID/compare/:raceID2/compare_scatterplot/:selectedCandidate_race1/:selectedCandidate_race2"
+                   render={({match}) => <CompareCandidatesWrap raceID={raceID} raceID2={raceID2} history={history} match={match}/>}/> 
             </Switch>
         </div>
     </div>
@@ -90,8 +90,9 @@ export default compose(
         renderNothing
     ),
     withHandlers({
-	handleChange: ({raceID, raceID2, history}) => compare =>
-	    history.push(`/race/${raceID}/compare/${raceID2}/${compare}`)
+	handleChange: ({raceID, raceID2, history}) => compare => {
+        compare == 'compare_scatterplot' ?  history.push(`/race/${raceID}/compare/${raceID2}/${compare}/1/1`) : history.push(`/race/${raceID}/compare/${raceID2}/${compare}` )
+        }
     })
 )(ComparePage)
 

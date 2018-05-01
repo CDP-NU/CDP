@@ -113,6 +113,11 @@ module.exports = {
 
 	    return db[queries[level]](race, zone)
 	},
+	compareCandidate: (_, {id, candidate}, {db}) => {
+
+	    const candidateID = `${id}+${candidate}`
+	    return db['compare_candidate'](id, candidateID)
+	},
 	breakdown: (_, {id, level}, {db}) => {
             
             const queries= {
