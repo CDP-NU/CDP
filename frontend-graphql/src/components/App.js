@@ -7,6 +7,7 @@ import DemographyMap from './DemographyMap'
 import GraphPage from './GraphPage'
 import DatabaseSearchContainer from './DatabaseSearchContainer'
 import TopBar from './TopBar'
+import CompareTopBar from './CompareTopBar'
 import Map from './Map'
 import cdp from './cdp.png'
 import ComparePage from './ComparePage'
@@ -43,7 +44,7 @@ const App = () => (
 		    <img className="home-btn_logo"
 			 src={cdp}/>
 		</a>
-		<h3>Browse Database</h3>
+		<h3><a href="http://cdp.northwestern.edu/database">Browse Database</a></h3>
 		<a className="sidebar_help-btn"
 		   href="http://cdp.northwestern.edu/index.php/chicago-elections-database-help">
 		    Help
@@ -52,12 +53,18 @@ const App = () => (
 	    <DatabaseSearchContainer/>
 	</div>
 	<div className="main-content">
-	    <Route path="/race/:raceID/:display"
-		   component={TopBar}/>
-	    <Route path="/demography/:id"
-		   render={ ({match: {params}}) => (
-			  <DemographyTopBar title={params.id}/>
-		   )}/>
+            <Switch>
+                <Route path="/race/:raceID/compare/:raceID2/"
+                       render={ ({match: {params}}) => (
+                              <CompareTopBar history={params}/>
+                       )}/>
+                <Route path="/race/:raceID/:display"
+                       component={TopBar}/>
+                <Route path="/demography/:id"
+                       render={ ({match: {params}}) => (
+                              <DemographyTopBar title={params.id}/>
+                       )}/>
+            </Switch>
 	    <Switch>
 		<Route path="/race/:raceID/maps"
 		       component={MapPageContainer}/>
