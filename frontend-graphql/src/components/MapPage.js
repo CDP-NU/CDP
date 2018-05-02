@@ -20,10 +20,6 @@ const MapPage = ({
     onGeocode,
 }) =>  (
     <div className="map-page">
-	<MapSelect url={url}
-		   history={history}
-		   candidates={candidates}
-		   loading={isRaceLoading}/>
 	<Map className="map-container">
 	    <div className="geocode_container" style={{}}>
 		<p><Icon type="environment"/> Go to address</p>

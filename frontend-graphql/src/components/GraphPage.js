@@ -11,20 +11,12 @@ const {Option} = Select
 
 const ScatterPlotPage = ({raceID, graph, url, onGraphChange}) => (
     <div className="scatter-plot_page">
-	<Select style={{ margin: '20px', width: 250 }}
-		size="large"
-		value={graph}
-		onChange={onGraphChange}>
-	    <Option value="candidates">Percentage of Votes by Candidate</Option>
-	    <Option value="turnout">Turnout vs Registered Voters By Ward</Option>
-	    <Option value="breakdown">Breakdown of Election</Option>
-	</Select>
 	<Switch>
-	    <Route path="/race/:raceID/graphs/candidates"
+	    <Route path="/race/:raceID/candidates"
 		   render={() => <BarGraph raceID={raceID}/>}/>
-	    <Route path="/race/:raceID/graphs/turnout"
+	    <Route path="/race/:raceID/turnout"
 		   render={() => <ScatterPlot raceID={raceID}/>}/>
-	    <Route path="/race/:raceID/graphs/breakdown"
+	    <Route path="/race/:raceID/breakdown"
                    render={() => <Breakdown raceID={raceID}/>}/>
 	    <Redirect to={`/?err=404&err_url=${url}`}/>
 	</Switch>

@@ -19,9 +19,9 @@ const MapSelect = ({
     level,
     onLevelChange
 }) => (
-    <div>
+    <div style={{ display: 'inline-block'}}>
 	<Select showSearch
-		style={{ margin: '10px 20px', width: 200 }}
+		style={{ display: 'inline-block', margin: '10px 20px', width: 200 }}
 		value={selectedMapName}
 		placeholder="Select a map"
 		optionFilterProp="children"

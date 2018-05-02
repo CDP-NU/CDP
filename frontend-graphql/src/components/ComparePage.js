@@ -5,7 +5,6 @@ import { gql, graphql } from 'react-apollo'
 import { Select } from 'antd'
 import './css/CompareRaces.css'
 import { Switch, Route, matchPath } from 'react-router-dom'
-import CompareBreakdown from './CompareBreakdown'
 import CompareBarGraph from './CompareBarGraph'
 import CompareCandidatesWrap from './CompareCandidatesWrap'
 
@@ -24,27 +23,13 @@ query compare($raceID: ID!) {
 const Option = Select.Option
 
 const ComparePage = ({raceID, raceID2, compare, handleChange, history}) => (
-    <div>
-        <div id="compare_select">
-            <Select 
-                style={{width:250, topMargin:'10px'}}
-                defaultValue="compare_bargraph"
-                onChange={handleChange}>
-                <Option value="compare_bargraph">Compare Bar Graph</Option>
-                <Option value="compare_breakdown">Compare Breakdown</Option>
-                <Option value="compare_scatterplot">Compare Scatterplot</Option>
-            </Select>
-        </div>
-        <div id="compare_page">
-            <Switch>
-                <Route path="/race/:raceID/compare/:raceID2/compare_bargraph"
-                   render={() => <CompareBarGraph raceID={raceID} raceID2={raceID2} />}/> 
-                <Route path="/race/:raceID/compare/:raceID2/compare_breakdown"
-                   render={() => <CompareBreakdown raceID={raceID} raceID2={raceID2} />}/> 
-                <Route path="/race/:raceID/compare/:raceID2/compare_scatterplot/:selectedCandidate_race1/:selectedCandidate_race2"
-                   render={({match}) => <CompareCandidatesWrap raceID={raceID} raceID2={raceID2} history={history} match={match}/>}/> 
-            </Switch>
-        </div>
+    <div id="compare_page">
+        <Switch>
+            <Route path="/race/:raceID/compare/:raceID2/compare_bargraph"
+               render={() => <CompareBarGraph raceID={raceID} raceID2={raceID2} />}/> 
+            <Route path="/race/:raceID/compare/:raceID2/compare_candidates/:selectedCandidate_race1/:selectedCandidate_race2"
+               render={({match}) => <CompareCandidatesWrap raceID={raceID} raceID2={raceID2} history={history} match={match}/>}/> 
+        </Switch>
     </div>
 )
 

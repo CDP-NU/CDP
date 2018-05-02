@@ -55,8 +55,8 @@ const App = () => (
 	<div className="main-content">
             <Switch>
                 <Route path="/race/:raceID/compare/:raceID2/"
-                       render={ ({match: {params}}) => (
-                              <CompareTopBar history={params}/>
+                       render={ ({history, match: {params}}) => (
+                              <CompareTopBar history={history} params={params}/>
                        )}/>
                 <Route path="/race/:raceID/:display"
                        component={TopBar}/>
@@ -68,10 +68,10 @@ const App = () => (
 	    <Switch>
 		<Route path="/race/:raceID/maps"
 		       component={MapPageContainer}/>
-		<Route path="/race/:raceID/graphs/:graph"
-		       component={GraphPage}/>
                 <Route path="/race/:raceID/compare/:raceID2/:compare"
                        component={ComparePage} />
+		<Route path="/race/:raceID/:graph"
+		       component={GraphPage}/>
 		<Route path="/demography/:id"
 		       render={ ({match: {params}}) => (
 			      <DemographyMap id={params.id}/>

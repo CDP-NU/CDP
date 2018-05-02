@@ -1,8 +1,9 @@
 import React from 'react'
-import { Redirect } from 'react-router-dom'
+import { Redirect, Switch, Route } from 'react-router-dom'
 import { Breadcrumb, Radio, Checkbox } from 'antd'
 import { gql, graphql } from 'react-apollo'
 import { compose, mapProps, withHandlers, branch, renderComponent } from 'recompose'
+import MapSelect from './MapSelect'
 const RadioButton = Radio.Button
 const RadioGroup = Radio.Group
 
@@ -15,9 +16,24 @@ query Race($raceID: ID!) {
 	year
 	electionType
 	office
+        candidates {
+            id
+            name
+        }
     }
 }`
 
+const raceCandidatesQuery = gql`
+query RaceCandidates($raceID: ID!) {
+    race(id: $raceID) {
+        id
+	candidates {
+	    id
+	    name
+	    color
+	}
+    }
+}`
 const getItems = ({date, electionType, name}) => [date, electionType, name]
 
 const createBreadcrumbItem = item => (
@@ -29,7 +45,14 @@ const style = {display: 'inline-block', marginRight: '20px'}
 const ErrorRedirect = ({url}) => <Redirect to={`/?err=500&err_url=${url}`}/>
 
 const Path = ({
-    items, display, onDisplayChange
+    items, 
+    display, 
+    onDisplayChange, 
+    url,
+    history,
+    race,
+    candidates,
+    isRaceLoading
 }) => (
     <div className="top-bar">
 	<Breadcrumb style={style}>
@@ -39,8 +62,17 @@ const Path = ({
 		    value={display}
 		    onChange={onDisplayChange}>
 	    <RadioButton value="maps">Map</RadioButton>
-	    <RadioButton value="graphs">Graph</RadioButton>
+	    <RadioButton value="candidates">Candidate Totals</RadioButton>
+	    <RadioButton value="breakdown">Breakdown by Ward</RadioButton>
+	    <RadioButton value="turnout">Turnout by Ward</RadioButton>
 	</RadioGroup>
+        {display == "maps" ? <MapSelect style={{display: 'inline-block'}} 
+                                        url={url}
+		                        history={history}
+		                        candidates={candidates}
+		                        loading={isRaceLoading}/> 
+            : null
+        }
     </div>
 )
 
@@ -53,7 +85,8 @@ export default compose(
 	history,
     })),
     graphql(raceQuery, {
-	props: ({ownProps, data: {loading, error, race}}) => ({
+        props: ({ownProps, data: {error, loading, race}}) => (
+            {
 	    ...ownProps,
 	    error: error,
 	    items: !loading && !error ? getItems(race) : []
@@ -63,12 +96,19 @@ export default compose(
 	({error}) => error,
 	renderComponent(ErrorRedirect)
     ),
+    graphql(raceCandidatesQuery, {
+	props: ({ownProps, data: {loading, error, race = {}}}) => ({
+	    ...ownProps,
+	    candidates: race.candidates,
+	    isRaceLoading: loading || error,
+	})
+    }),
     withHandlers({
 	onDisplayChange: ({raceID, history}) => ({target}) =>
 	    history.push(
 		target.value === 'maps' ?
 		`/race/${raceID}/maps/ward` :
-		`/race/${raceID}/graphs/candidates`
-	    )
+	        `/race/${raceID}/${target.value}`
+            ),
     })
 )(Path)

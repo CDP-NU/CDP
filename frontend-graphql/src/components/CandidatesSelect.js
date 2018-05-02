@@ -83,11 +83,11 @@ export default compose(
     withHandlers({
 	onCandidate1Select: ({raceID, raceID2, selectedCandidate_race2, list_race1, history}) => name => {
             const idx = list_race1.indexOf(name) + 1
-            history.push(`/race/${raceID}/compare/${raceID2}/compare_scatterplot/${idx}/${selectedCandidate_race2}`)
+            history.push(`/race/${raceID}/compare/${raceID2}/compare_candidates/${idx}/${selectedCandidate_race2}`)
 	},
 	onCandidate2Select: ({raceID, raceID2, selectedCandidate_race1, list_race2, history}) => name => {
             const idx = list_race2.indexOf(name) + 1
-            history.push(`/race/${raceID}/compare/${raceID2}/compare_scatterplot/${selectedCandidate_race1}/${idx}`)
+            history.push(`/race/${raceID}/compare/${raceID2}/compare_candidates/${selectedCandidate_race1}/${idx}`)
 	}
     })
 )(CandidatesSelect)

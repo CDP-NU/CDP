@@ -38,7 +38,7 @@ const createBreadcrumbItem = item => (
 const ErrorRedirect = ({url}) => <Redirect to={`/?err=500&err_url=${url}`}/>
 
 const Path = ({
-    race1_items, race2_items, display, onDisplayChange
+    race1_items, race2_items, display, compare, onCompareChange, onDisplayChange
 }) => (
     <div className="top-bar">
 	<Breadcrumb style={{display: 'inline-block', marginRight: '20px'}}>
@@ -50,6 +50,11 @@ const Path = ({
 	    <RadioButton value="maps">Map</RadioButton>
 	    <RadioButton value="graphs">Graph</RadioButton>
 	</RadioGroup>
+	<RadioGroup style={{display: 'inline-block', marginLeft: '20px'}}
+		    onChange={onCompareChange}>
+	    <RadioButton value="compare_bargraph">Election</RadioButton>
+	    <RadioButton value="compare_candidates">Candidates</RadioButton>
+	</RadioGroup>
 	<Breadcrumb style={{display: 'inline-block', marginLeft: '20px'}}>
 	    {race2_items.map(createBreadcrumbItem)}
 	</Breadcrumb>
@@ -58,9 +63,9 @@ const Path = ({
 
 
 export default compose(
-    mapProps( ({match, history}) => ({
-	raceID: history.raceID,
-	raceID2: history.raceID2,
+    mapProps( ({history, match, params}) => ({
+	raceID: params.raceID,
+	raceID2: params.raceID2,
 	history,
     })),
     graphql(raceQuery1, {
@@ -86,7 +91,10 @@ export default compose(
 	    history.push(
 		target.value === 'maps' ?
 		`/race/${raceID}/maps/ward` :
-		`/race/${raceID}/graphs/candidates`
-	    )
+		`/race/${raceID}/candidates`
+	    ),
+	onCompareChange: ({raceID, raceID2, history}) => compare => {
+            compare.target.value == 'compare_candidates' ?  history.push(`/race/${raceID}/compare/${raceID2}/${compare.target.value}/1/1`) : history.push(`/race/${raceID}/compare/${raceID2}/${compare.target.value}` )
+        }
     })
 )(Path)
