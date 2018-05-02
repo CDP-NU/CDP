@@ -37,6 +37,11 @@ query ScatterPlot($raceID2: ID!, $selectedCandidate_race2: Int!) {
 	    color
             pct
 	}
+        electionType
+        office
+        date
+        year
+        name
     }
     compareCandidate(id: $raceID2, candidate: $selectedCandidate_race2)
 }`
@@ -44,13 +49,11 @@ query ScatterPlot($raceID2: ID!, $selectedCandidate_race2: Int!) {
 const loadD3 = (race1, race2) => {
 
     console.log(race1, race2)
-    // Only displays dots where a candidates is voted for in that ward for both elections.  Future version could include other wards
+    // Only displays dots where a candidates is voted for in that ward for both elections.  Future version could include allwards
     const wards = _.intersection(race1.compareCandidate.map(item=>item.ward), race2.compareCandidate.map(item=>item.ward))
-    const data = 
-        _.map(wards, w => {return { ward:w,
+    const data = _.map(wards, w => {return { ward:w,
                                     r1:_.findWhere(race1.compareCandidate, {ward:w}).pct, 
-                                    r2:_.findWhere(race2.compareCandidate, {ward:w}).pct
-        }})
+                                    r2:_.findWhere(race2.compareCandidate, {ward:w}).pct }})
     
 
     const margin = {top: 20, right: 15, bottom: 60, left: 60}
@@ -137,7 +140,8 @@ const loadD3 = (race1, race2) => {
             tooltip.transition()
                 .duration(200)
                 .style("opacity", .9);
-            tooltip.html("Ward: " + d[3] + "<br/>" + "Registered Voters: " + d[0] + "<br>" +  "Turnout Pct: " + Math.floor(d[1]) + "%") 
+            tooltip.html("Ward: " + d.ward + "<br/>" +  "Candidate: " + race1.compareCandidate[0]["name"]  + "<br>Race: " + race1.race.name + "<br>Votes: " + d.r1 + "%<br>" +
+                                                        "Candidate: " + race2.compareCandidate[0]["name"]  + "<br>Race: " + race2.race.name + "<br>Votes: " + d.r2 + "%<br>") 
                 .style("left", (d3.event.pageX) + "px")
                 .style("top", (d3.event.pageY - 28) + "px");
             })
@@ -157,8 +161,8 @@ class CompareCandidates extends React.Component {
     }
 
     componentWillReceiveProps(next) {
-	if((this.props.race1.compareCandidate !== next.race1.compareCandidate) || (this.props.race2.compareCandidate !== next.race2.compareCandidate) ) {
-	    loadD3(next.race1.compareCandidate, next.race2.compareCandidate)
+	if((this.props.race1 !== next.race1) || (this.props.race2 !== next.race2) ) {
+	    loadD3(next.race1, next.race2)
 	}
     }
     
