@@ -3,7 +3,7 @@ import * as d3 from 'd3'
 import { compose, branch, renameProp, renderNothing, mapProps, withHandlers, flattenProp } from 'recompose' 
 import { gql, graphql } from 'react-apollo'
 import { Select } from 'antd'
-import './css/CompareBreakdown.css'
+import '../css/MainContent.css'
 import { Switch, Route } from 'react-router-dom'
 import _ from 'underscore'
 

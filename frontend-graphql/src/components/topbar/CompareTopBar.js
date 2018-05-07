@@ -40,7 +40,7 @@ const ErrorRedirect = ({url}) => <Redirect to={`/?err=500&err_url=${url}`}/>
 const Path = ({
     race1_items, race2_items, display, compare, onCompareChange, onDisplayChange
 }) => (
-    <div className="top-bar">
+    <div className="top-bar" style={{height:'48px', margin:'auto'}}>
 	<Breadcrumb style={{display: 'inline-block', marginRight: '20px'}}>
 	    {race1_items.map(createBreadcrumbItem)}
 	</Breadcrumb>

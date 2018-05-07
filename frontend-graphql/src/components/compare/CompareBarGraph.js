@@ -2,7 +2,7 @@ import React from 'react'
 import * as d3 from 'd3'
 import { compose, branch, renderNothing, mapProps, flattenProp, renameProp } from 'recompose'
 import { gql, graphql } from 'react-apollo'
-import './css/CompareBarGraph.css'
+import '../css/MainContent.css'
 
 const candidateStatsQuery = gql`
 query CandidateStats($raceID: ID!) {

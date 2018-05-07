@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import createMap from '../map.js'
+import createMap from '../../map.js'
 
 class LeafletWrapper extends React.Component {
 

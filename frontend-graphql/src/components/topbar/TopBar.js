@@ -54,7 +54,7 @@ const Path = ({
     candidates,
     isRaceLoading
 }) => (
-    <div className="top-bar">
+    <div className="top-bar" style={{height:'48px'}}>
 	<Breadcrumb style={style}>
 	    {items.map(createBreadcrumbItem)}
 	</Breadcrumb>

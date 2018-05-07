@@ -2,7 +2,7 @@ import React from 'react'
 import * as d3 from 'd3'
 import { compose, branch, renderNothing, flattenProp } from 'recompose' 
 import { gql, graphql } from 'react-apollo'
-import './css/Breakdown.css'
+import '../css/MainContent.css'
 
 //Ethan used square.github.io/intro-to-d3/examples for this!!
 

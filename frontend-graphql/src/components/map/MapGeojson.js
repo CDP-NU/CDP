@@ -1,6 +1,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { eqByKeys } from '../utility'
+
+const eqByKeys = (keys, x, y) => keys
+    .every( key => x[key] === y[key] )
 
 export default class MapGeojson extends React.Component {
 

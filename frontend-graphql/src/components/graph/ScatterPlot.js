@@ -3,6 +3,7 @@ import * as d3 from 'd3'
 import { Modal } from 'antd'
 import { compose, flattenProp, branch, renderNothing, withPropsOnChange, renderComponent } from 'recompose'
 import { gql, graphql } from 'react-apollo'
+import '../css/MainContent.css'
 
 //http://bl.ocks.org/bunkat/2595950
 //https://bl.ocks.org/d3noob/23e42c8f67210ac6c678db2cd07a747e text labels

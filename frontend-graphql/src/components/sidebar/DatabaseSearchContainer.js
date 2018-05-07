@@ -1,7 +1,8 @@
 import { compose, mapProps, withStateHandlers, withProps, withHandlers } from 'recompose'
 import { gql, graphql } from 'react-apollo'
-import DatabaseSearch from './DatabaseSearch'
+import {DatabaseSearch, selectMin, selectMax }from './DatabaseSearch'
 import withThrottledProps from './withThrottledProps'
+import { withRouter } from 'react-router-dom'
 
 const searchQuery = gql`
 query Search($keyword: String, $start: String!, $end: String!, $elections: [String]!, $offices: [String]!, $demographies: [String]!) {
@@ -11,22 +12,26 @@ query Search($keyword: String, $start: String!, $end: String!, $elections: [Stri
     }
 }`
 
+	    //startDate: '2000/01/01',
+	    //endDate: '2017/12/31',
 export default compose(
+    withRouter,
     withStateHandlers(
-	{
+        ({location}) => ({
 	    keyword: '',
-	    startDate: '2000/01/01',
-	    endDate: '2017/12/31',
+	    startDate: `${selectMin(location.pathname)}/01/01`,
+	    endDate: `${selectMax(location.pathname)}/12/31`,
 	    elections: [],
 	    offices: [],
 	    demographies: [],
-            compare: false
-	},
+	    location,
+        compare: false
+	}),
 	{
 	    onKeywordChange: () => keyword => ({keyword}),
 	    onYearRangeChange: () => ([start, end]) => ({
-		startDate: `${start}/01/01`,
-		endDate: `${end}/12/31`
+			startDate: `${start}/01/01`,
+			endDate: `${end}/12/31`,
 	    }),
 	    onElectionChange: () => elections => ({elections}),
 	    onOfficeChange: () => offices => ({offices}),
@@ -41,8 +46,12 @@ export default compose(
 	    onDemographyTagClose: ({demographies}) => name => ({
 		demographies: demographies.filter( d=> d !== name )
 	    }),
-            onCompareChange: ({compare}) => value => ({
-                compare: value.target.checked}),
+        onCompareChange: ({compare, location}) => value => ({
+
+        	startDate: (value === true) ?  (`${selectMin(location.pathname)}/01/01`) : ( `2004/01/01` ),
+        	endDate: (value === true) ? (`${selectMax(location.pathname)}/12/31`) : ( `2018/12/31` ),
+            compare: value
+        }),
 	    resetSearch: () => () => ({
 		keyword: '',
 		elections: [],
@@ -83,13 +92,13 @@ export default compose(
 	})
     }),
     mapProps(({
-	startDate,
-	endDate,
-	...props
+		startDate,
+		endDate,
+		...props
     }) => ({
-	...props,
-	startYear: parseInt(startDate.substr(0, 4), 10),
-	endYear: parseInt(endDate.substr(0, 4), 10)
+		...props,
+		startYear: parseInt(startDate.substr(0,4),10),
+		endYear: parseInt(endDate.substr(0, 4), 10)
     })),
     withHandlers({
 	onSearchResultClick: ({resetSearch}) => () => {

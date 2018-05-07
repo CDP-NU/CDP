@@ -2,15 +2,15 @@ import React from 'react'
 import { Switch, Route } from 'react-router-dom'
 import { Modal, Button, Checkbox} from 'antd'
 import './css/App.css'
-import MapPageContainer from './MapPageContainer'
-import DemographyMap from './DemographyMap'
-import GraphPage from './GraphPage'
-import DatabaseSearchContainer from './DatabaseSearchContainer'
-import TopBar from './TopBar'
-import CompareTopBar from './CompareTopBar'
-import Map from './Map'
+import MapPageContainer from './map/MapPageContainer'
+import DemographyMap from './map/DemographyMap'
+import GraphPage from './graph/GraphPage'
+import DatabaseSearchContainer from './sidebar/DatabaseSearchContainer'
+import TopBar from './topbar/TopBar'
+import CompareTopBar from './topbar/CompareTopBar'
+import Map from './map/Map'
 import cdp from './cdp.png'
-import ComparePage from './ComparePage'
+import ComparePage from './compare/ComparePage'
 
 class NoMatch extends React.Component {
 
@@ -33,7 +33,7 @@ const DemographyTopBar = ({
     </div>
 )
 
-
+//<Route path="/:type/:raceID/" children={(props) => (<DatabaseSearchContainer {...props} />) }/>
 
 const App = () => (
     <div>

@@ -5,7 +5,6 @@ import Map from './Map'
 import Geocode from './Geocode'
 import RaceMap from './RaceMap'
 import CandidateMap from './CandidateMap'
-import MapSelect from './MapSelect'
 import MapPopup from './MapPopup'
 
 const MapPage = ({
