@@ -46,22 +46,23 @@ const CompareCandidatesWrap = ({
     race2, 
     url,
     history }) => (
-    <div className="scatter-plot_wrap">
+    <div>
 
-	<CompareCandidates 
-                    raceID={raceID} 
-                    raceID2={raceID2} 
-                    selectedCandidate_race1={selectedCandidate_race1}
-                    selectedCandidate_race2={selectedCandidate_race2}/>
-
-                <CandidatesSelect url={url}
-		    history={history}
-		    race1={race1}
-		    race2={race2}
+    <CandidatesSelect url={url}
+            history={history}
+            race1={race1}
+            race2={race2}
                     raceID={raceID}
                     raceID2={raceID2}
                     selectedCandidate_race1={selectedCandidate_race1}
                     selectedCandidate_race2={selectedCandidate_race2}/>
+	<CompareCandidates 
+                    raceID={raceID} 
+                    raceID2={raceID2} 
+                    selectedCandidate_race1={selectedCandidate_race1}
+                    selectedCandidate_race2={selectedCandidate_race2}
+    />
+
     </div>
 )
 

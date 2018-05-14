@@ -179,13 +179,14 @@ class CompareBarGraph extends React.Component {
         loadD3(this.props.race1.race.candidates, "#CompareBarGraph_race1") 
         loadD3(this.props.race2.race.candidates, "#CompareBarGraph_race2")
     }
+    /* componentWillReceiveProps causes the candidates to double— unsure why but functionality is okay without */
 
-    componentWillReceiveProps(next) {
-	if((this.props.race1!== next.race1) || (this.props.race2!== next.race2) ) {
-	    loadD3(next.race1.race.candidates, "#CompareBarGraph_race1")
-	    loadD3(next.race2.race.candidates, "#CompareBarGraph_race2")
-	}
-    }
+ //    componentWillReceiveProps(next) {
+	// if((this.props.race1!== next.race1) || (this.props.race2!== next.race2) ) {
+	//     loadD3(next.race1.race.candidates, "#CompareBarGraph_race1")
+	//     loadD3(next.race2.race.candidates, "#CompareBarGraph_race2")
+	// }
+ //    }
     
 
     shouldComponentUpdate() {

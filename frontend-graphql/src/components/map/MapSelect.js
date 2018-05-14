@@ -19,9 +19,9 @@ const MapSelect = ({
     level,
     onLevelChange
 }) => (
-    <div style={{ display: 'inline-block'}}>
+    <div style={{ }}>
 	<Select showSearch
-		style={{ display: 'inline-block', marginLeft: '20px', width: 200 }}
+		style={{ marginTop:10, width: 200 }}
 		value={selectedMapName}
 		placeholder="Select a map"
 		optionFilterProp="children"
@@ -31,7 +31,7 @@ const MapSelect = ({
 		<Option key={name} value={name}>{name}</Option>
 	     )}
 	</Select>
-	<RadioGroup style={{display: 'inline-block'}}
+	<RadioGroup style={{marginTop:10}}
 		    value={level}
 		    onChange={onLevelChange}>
 	    <RadioButton value="ward">Ward</RadioButton>

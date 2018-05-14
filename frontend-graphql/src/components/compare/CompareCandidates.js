@@ -57,11 +57,15 @@ const loadD3 = (race1, race2) => {
     
 
     const margin = {top: 20, right: 15, bottom: 60, left: 60}
-    const width = 960 - margin.left - margin.right
-    const height = 500 - margin.top - margin.bottom
+    // const width = 960 - margin.left - margin.right
+    // const height = 500 - margin.top - margin.bottom
 
-    const svgWidth = width + margin.right + margin.left
-    const svgHeight = height + margin.top + margin.bottom
+    // const svgWidth = width + margin.right + margin.left
+    // const svgHeight = height + margin.top + margin.bottom
+    const svgWidth = 960
+    const svgHeight = 800  
+    const width = svgWidth - margin.left - margin.right
+    const height = svgHeight - margin.top - margin.bottom
     
 
     const x = d3.scaleLinear()
@@ -72,7 +76,7 @@ const loadD3 = (race1, race2) => {
                 .domain([0, 100])
                 .range([height, 0])
 
-    const scatterplot = d3.select('#scatterplot')
+    const scatterplot = d3.select('#compare_scatterplot')
 
     scatterplot.selectAll('*').remove()
     
@@ -165,7 +169,7 @@ class CompareCandidates extends React.Component {
 	    loadD3(next.race1, next.race2)
 	}
     }
-    
+
     shouldComponentUpdate() {
 	return false
     }
@@ -173,7 +177,7 @@ class CompareCandidates extends React.Component {
     render() {
 	return (
             <div>
-                <div id="scatterplot"/>
+                <div id="compare_scatterplot"/>
             </div>
 	)
     }

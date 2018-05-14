@@ -3,6 +3,7 @@ import { Redirect, Switch, Route } from 'react-router-dom'
 import { Breadcrumb, Radio, Checkbox } from 'antd'
 import { gql, graphql } from 'react-apollo'
 import { compose, mapProps, withHandlers, branch, renderComponent } from 'recompose'
+import MapSelect from './MapSelect'
 const RadioButton = Radio.Button
 const RadioGroup = Radio.Group
 
@@ -59,12 +60,21 @@ const Path = ({
 	</Breadcrumb>
 	<RadioGroup style={{display: 'inline-block'}}
 		    value={display}
+		    size="small"
 		    onChange={onDisplayChange}>
 	    <RadioButton value="maps">Map</RadioButton>
 	    <RadioButton value="candidates">Candidate Totals</RadioButton>
 	    <RadioButton value="breakdown">Breakdown by Ward</RadioButton>
 	    <RadioButton value="turnout">Turnout by Ward</RadioButton>
 	</RadioGroup>
+        {display == "maps" ? <MapSelect style={{display: 'inline-block'}} 
+                                        url={url}
+                                        size="small"
+		                        history={history}
+		                        candidates={candidates}
+		                        loading={isRaceLoading}/> 
+            : null
+        }
     </div>
 )
 

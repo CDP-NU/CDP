@@ -1,6 +1,7 @@
 import React from 'react'
+import MapSelect from './MapSelect'
 import { Route, Redirect, Switch } from 'react-router-dom'
-import { Icon } from 'antd'
+import { Icon, Collapse } from 'antd'
 import Map from './Map'
 import Geocode from './Geocode'
 import RaceMap from './RaceMap'
@@ -20,10 +21,20 @@ const MapPage = ({
 }) =>  (
     <div className="map-page">
 	<Map className="map-container">
-	    <div className="geocode_container" style={{}}>
-		<p><Icon type="environment"/> Go to address</p>
-		<Geocode onGeocode={onGeocode}/>
-	    </div>
+		<div className="geocode_container" >
+			<Collapse defaultActiveKey={['mapTools']} bordered={false} style={{backgroundColor:"transparent"}}>
+			<Collapse.Panel header="Map Tools" key="mapTools" style={{color:"transparent"}}>
+				<p><Icon type="environment"/> Go to address</p>
+				<Geocode onGeocode={onGeocode}/>
+			    <MapSelect style={{}} 
+	                                        url={url}
+			                        history={history}
+			                        candidates={candidates}
+			                        loading={isRaceLoading}/> 
+			</Collapse.Panel>
+		    </Collapse>
+		</div>
+
 	    <Switch>
 		<Route path="/race/:raceID/maps/ward"
 		       render={() => (

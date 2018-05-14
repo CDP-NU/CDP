@@ -71,7 +71,7 @@ svg text.label {
 #compare_page{
     position: absolute;
     top: 50px;
-    left: 0px
+    left: 10px
 }
 
 #compare_select{
@@ -80,6 +80,11 @@ svg text.label {
     top: 10px
 }
 
+#compare_scatterplot{
+    min-height: 400px;
+    min-width: 925px;
+    float: left;
+}
 
 #scatterplot{
     min-height: 400px;

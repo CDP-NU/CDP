@@ -1,5 +1,5 @@
 import React from 'react'
-import { Card, Tag, Collapse, Slider, Switch} from 'antd'
+import { Card, Tag, Collapse, Slider, Switch, Button, Radio} from 'antd'
 import Autocomplete from './Autocomplete'
 import SearchResultMenu from './SearchResultMenu'
 const {Panel} = Collapse
@@ -107,16 +107,21 @@ export const DatabaseSearch = ({
     onDemographyTagClose,
     onSearchResultClick,
     onCompareChange,
+    onClear,
     compare,
     match,
     location,
+    history
 }) => (
     <div className="database-search">
 	<div className="search-filters">
 	    <Autocomplete onSearch={onKeywordChange}/>
             <div style={{position: 'inline-block'}}>
-                <Switch style={{position: 'inline-block', width: '100%', zIndex: '1'}} onChange={onCompareChange} 
-                        unCheckedChildren="Display One Race" checkedChildren="Compare Two Races"/>
+                <Radio.Group style={{position: 'inline-block'}} value={compare} onChange={onCompareChange}>
+                    <Radio.Button value="false">Display One Race</Radio.Button>
+                    <Radio.Button value="true">Compare Two Races</Radio.Button>
+                </Radio.Group>
+                <Button onClick={onClear} style={{position: 'inline-block', right: '-20px'}}>Clear Search</Button>
                 <Collapse style={{position: 'inline-block', width: '100%'}}>
                     <Panel header="Search Tools"
                            key="1">

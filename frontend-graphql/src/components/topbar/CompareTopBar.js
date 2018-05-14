@@ -44,16 +44,10 @@ const Path = ({
 	<Breadcrumb style={{display: 'inline-block', marginRight: '20px'}}>
 	    {race1_items.map(createBreadcrumbItem)}
 	</Breadcrumb>
-	<RadioGroup style={{display: 'inline-block'}}
-		    value={display}
-		    onChange={onDisplayChange}>
-	    <RadioButton value="maps">Map</RadioButton>
-	    <RadioButton value="graphs">Graph</RadioButton>
-	</RadioGroup>
 	<RadioGroup style={{display: 'inline-block', marginLeft: '20px'}}
 		    onChange={onCompareChange}>
-	    <RadioButton value="compare_bargraph">Election</RadioButton>
 	    <RadioButton value="compare_candidates">Candidates</RadioButton>
+	    <RadioButton value="compare_bargraph">Election</RadioButton>
 	</RadioGroup>
 	<Breadcrumb style={{display: 'inline-block', marginLeft: '20px'}}>
 	    {race2_items.map(createBreadcrumbItem)}

@@ -27,7 +27,7 @@ const CandidateMenu = ({raceID, candidates, onSelect}) => (
     </Menu>
 )
 
-const CompareLink = (id, race1, compare) => ((compare === true ) && (race1 !== undefined)) ? `/race/${race1}/compare/${id}/compare_bargraph` : `/race/${id}/maps/ward`
+const CompareLink = (id, race1, compare) => ((compare === "true" ) && (race1 !== undefined)) ? `/race/${race1}/compare/${id}/compare_candidates/1/1` : `/race/${id}/maps/ward`
 
 export const RaceCard = ({
     id,
