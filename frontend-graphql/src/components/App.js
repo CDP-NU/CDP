@@ -11,6 +11,7 @@ import CompareTopBar from './topbar/CompareTopBar'
 import Map from './map/Map'
 import cdp from './cdp.png'
 import ComparePage from './compare/ComparePage'
+import HomeTopBar from './topbar/HomeTopBar'
 /*
 App.js returns <App />, the main presentational component for the website.  <App /> works through conditional route rendering, meaning that it will
 render different things depending on the current URL.  <Switch /> tags mean "if the route present in <Route path /> is present, render that.
@@ -70,6 +71,8 @@ const App = () => (
 	</div>
 	<div className="main-content">
         <Switch>
+        	<Route path="/" exact={true}
+        			component={HomeTopBar} />
             <Route path="/race/:raceID/compare/:raceID2/"
                    render={ ({history, match: {params}}) => (
                           <CompareTopBar history={history} params={params}/>
@@ -91,13 +94,15 @@ const App = () => (
 			<Route path="/demography/:id"
 			       render={ ({match: {params}}) => (
 				      <DemographyMap id={params.id}/> )}/>
-			<Route path="/"
+			 <Route path="/"
 			       exact={true}
 			       render={({location}) =>
-				   location.search.match(/err=([^&]*)/) ?
-						     <NoMatch/> :
-						     <Map className="home-page_map"/> 
-				      }/>
+			 	   location.search.match(/err=([^&]*)/) ?
+			 			     <NoMatch/> :
+			 			     <div className="map-container">
+				 			     <Map className="app-map"/>  
+			 			     </div>
+			 	      }/>
 	    </Switch>
 	</div>
     </div>
@@ -105,3 +110,10 @@ const App = () => (
 
 export default App
 
+			// <Route path="/"
+			//        exact={true}
+			//        render={({location}) =>
+			// 	   location.search.match(/err=([^&]*)/) ?
+			// 			     <NoMatch/> :
+			// 			     <Map className="home-page_map"/> 
+			// 	      }/>
