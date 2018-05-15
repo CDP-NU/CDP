@@ -84,14 +84,13 @@ const App = () => (
 	    <Switch>
 			<Route path="/race/:raceID/maps"
 			       component={MapPageContainer}/>
-	                <Route path="/race/:raceID/compare/:raceID2/:compare"
-	                       component={ComparePage} />
+	        <Route path="/race/:raceID/compare/:raceID2/:compare"
+	               component={ComparePage} />
 			<Route path="/race/:raceID/:graph"
 			       component={GraphPage}/>
 			<Route path="/demography/:id"
 			       render={ ({match: {params}}) => (
-				      <DemographyMap id={params.id}/>
-				   )}/>
+				      <DemographyMap id={params.id}/> )}/>
 			<Route path="/"
 			       exact={true}
 			       render={({location}) =>

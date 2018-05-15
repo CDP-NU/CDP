@@ -4,7 +4,9 @@ const bodyParser = require('body-parser')
 const massive = require('massive')
 const schema = require('./data/schema')
 
-const connectionString = 'postgres://eroubenoff:144230@localhost:5432/election5'
+const connectionString = 'postgres://eroubenoff:144230@localhost:5432/election7'
+//election5 is the working database
+//election7 is the new one 
 
 massive({connectionString}).then( db => {
 
