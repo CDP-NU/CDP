@@ -48,7 +48,8 @@ const CompareCandidatesWrap = ({
     history }) => (
     <div>
 
-    <CandidatesSelect url={url}
+    <CandidatesSelect 
+            url={url}
             history={history}
             race1={race1}
             race2={race2}

@@ -61,8 +61,6 @@
 }
 
 
-
-
 .main-content {
     position: absolute;
     left: 400px;
@@ -112,7 +110,7 @@
 
 
 .search-tag {
-    margin-bottom: 5px;
+    margin-bottom: 0px;
 }
 .search-tags {
     padding: 10px;

@@ -3,6 +3,7 @@ import { Redirect } from 'react-router-dom'
 import { Breadcrumb, Radio, Checkbox } from 'antd'
 import { gql, graphql } from 'react-apollo'
 import { compose, mapProps, withHandlers, branch, renderComponent, renderNothing} from 'recompose'
+import Help from './Help.js'
 const RadioButton = Radio.Button
 const RadioGroup = Radio.Group
 
@@ -40,7 +41,10 @@ const ErrorRedirect = ({url}) => <Redirect to={`/?err=500&err_url=${url}`}/>
 const Path = ({
     race1_items, race2_items, display, compare, onCompareChange, onDisplayChange
 }) => (
-    <div className="top-bar" style={{height:'48px', margin:'auto'}}>
+    <div className="top-bar" style={{minHeight:'48px', margin:'auto'}}>
+    <div style={{minWidth:'130px', marginRight:'10px', display:'inline-block'}}>
+	    <Help />
+    </div>
 	<Breadcrumb style={{display: 'inline-block', marginRight: '20px'}}>
 	    {race1_items.map(createBreadcrumbItem)}
 	</Breadcrumb>

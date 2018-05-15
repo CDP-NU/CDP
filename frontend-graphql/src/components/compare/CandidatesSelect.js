@@ -43,6 +43,8 @@ const getMatch = (url, candidates) => {
 }
 
 const CandidatesSelect = ({
+	race1,
+	race2,
     list_race1,
     list_race2,
     selectedCandidate_race1,
@@ -76,6 +78,7 @@ const CandidatesSelect = ({
 export default compose(
     withProps( ({url, ...props}) => {
         return {
+        ...props,
 	    list_race1: props.race1.race.candidates.map(c => c.name),
 	    list_race2: props.race2.race.candidates.map(c => c.name)
 	}

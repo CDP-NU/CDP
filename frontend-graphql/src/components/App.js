@@ -12,6 +12,7 @@ import Map from './map/Map'
 import cdp from './cdp.png'
 import ComparePage from './compare/ComparePage'
 import HomeTopBar from './topbar/HomeTopBar'
+import DemographyTopBar from './topbar/DemographyTopBar'
 /*
 App.js returns <App />, the main presentational component for the website.  <App /> works through conditional route rendering, meaning that it will
 render different things depending on the current URL.  <Switch /> tags mean "if the route present in <Route path /> is present, render that.
@@ -43,13 +44,6 @@ class NoMatch extends React.Component {
     }
 }
 
-const DemographyTopBar = ({
-    title
-}) => (
-    <div className="top-bar">
-	<h3>{title}</h3>
-    </div>
-)
 
 
 const App = () => (
@@ -61,7 +55,7 @@ const App = () => (
 				    <img className="home-btn_logo"
 					src={cdp}/>
 				</a>
-				<h3><a href="http://cdp.northwestern.edu/database">Browse Database</a></h3>
+				<h3>Browse Database</h3>
 				<a className="sidebar_help-btn"
 				   href="http://cdp.northwestern.edu/index.php/chicago-elections-database-help">
 				    Help
@@ -79,9 +73,9 @@ const App = () => (
                    )}/>
             <Route path="/race/:raceID/:display"
                    component={TopBar}/>
-            <Route path="/demography/:id"
-                   render={ ({match: {params}}) => (
-                          <DemographyTopBar title={params.id}/>
+            <Route path="/demography/:id/:level"
+                   render={ ({history, match: {params}}) => (
+                          <DemographyTopBar history={history} level={params.level} title={params.id}/>
                    )}/>
         </Switch>
 	    <Switch>
@@ -91,9 +85,10 @@ const App = () => (
 	               component={ComparePage} />
 			<Route path="/race/:raceID/:graph"
 			       component={GraphPage}/>
-			<Route path="/demography/:id"
-			       render={ ({match: {params}}) => (
-				      <DemographyMap id={params.id}/> )}/>
+            <Route path="/demography/:id/:level"
+                   render={ ({history, match: {params}}) => (
+                          <DemographyMap history={history} match={params} level={params.level} id={params.id}/>
+                   )}/>
 			 <Route path="/"
 			       exact={true}
 			       render={({location}) =>

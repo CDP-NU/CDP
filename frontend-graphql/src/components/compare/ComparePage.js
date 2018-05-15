@@ -23,7 +23,7 @@ query compare($raceID: ID!) {
 const Option = Select.Option
 
 const ComparePage = ({raceID, raceID2, compare, handleChange, history}) => (
-    <div id="compare_page">
+    <div className="compare_page" style={{float:'left', marginLeft:'10px'}}>
         <Switch>
             <Route path="/race/:raceID/compare/:raceID2/compare_bargraph"
                render={() => <CompareBarGraph raceID={raceID} raceID2={raceID2} />}/> 

@@ -117,14 +117,18 @@ export const DatabaseSearch = ({
 	<div className="search-filters">
 	    <Autocomplete onSearch={onKeywordChange}/>
             <div style={{position: 'inline-block'}}>
-                <Radio.Group style={{position: 'inline-block'}} value={compare} onChange={onCompareChange}>
-                    <Radio.Button value="false">Display One Race</Radio.Button>
-                    <Radio.Button value="true">Compare Two Races</Radio.Button>
-                </Radio.Group>
-                <Button onClick={onClear} style={{position: 'inline-block', right: '-20px'}}>Clear Search</Button>
-                <Collapse style={{position: 'inline-block', width: '100%'}}>
-                    <Panel header="Search Tools"
-                           key="1">
+                <Collapse style={{position: 'inline-block', width:'100%'}}>
+                    <Panel showArrow={false} disabled={true}
+                        header={ (<div> 
+                            <Radio.Group style={{position: 'inline-block', zIndex:'1000'}} value={compare} onChange={onCompareChange}>
+                                <Radio.Button value="false">Display One Race</Radio.Button>
+                                <Radio.Button value="true">Compare Two Races</Radio.Button>
+                            </Radio.Group>
+                            <Button onClick={onClear} type="danger" style={{position: 'inline-block', bottom:'1px', marginLeft:'20px'}}>Clear</Button>
+                            </div>)}
+                        key="0">
+                        </Panel>
+                    <Panel header="Search Tools" key="1">
                         <h4>Year Range</h4>
                         <p>{`${startYear} - ${endYear}`}</p>
                         { (compare == true) ?  
