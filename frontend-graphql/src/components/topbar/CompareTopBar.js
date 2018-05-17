@@ -42,20 +42,22 @@ const Path = ({
     race1_items, race2_items, display, compare, onCompareChange, onDisplayChange
 }) => (
     <div className="top-bar" style={{minHeight:'48px', margin:'auto'}}>
-    <div style={{minWidth:'130px', marginRight:'10px', display:'inline-block'}}>
-	    <Help />
-    </div>
-	<Breadcrumb style={{display: 'inline-block', marginRight: '20px'}}>
-	    {race1_items.map(createBreadcrumbItem)}
-	</Breadcrumb>
-	<RadioGroup style={{display: 'inline-block', marginLeft: '20px'}}
-		    onChange={onCompareChange}>
-	    <RadioButton value="compare_candidates">Candidates</RadioButton>
-	    <RadioButton value="compare_bargraph">Election</RadioButton>
-	</RadioGroup>
-	<Breadcrumb style={{display: 'inline-block', marginLeft: '20px'}}>
-	    {race2_items.map(createBreadcrumbItem)}
-	</Breadcrumb>
+	    <div style={{minWidth:'130px', marginRight:'10px', display:'inline-block'}}>
+		    <Help />
+	    </div>
+		<RadioGroup style={{display: 'inline-block', marginLeft: '20px'}}
+			    onChange={onCompareChange}>
+		    <RadioButton value="compare_candidates">Candidates</RadioButton>
+		    <RadioButton value="compare_bargraph">Election</RadioButton>
+		</RadioGroup>
+	    <div style={{marginLeft: '20px', height:'40px', position:'absolute', width:'100%', display: 'inline-block'}}>
+			<Breadcrumb style={{position: 'absolute'}}>
+			    {race1_items.map(createBreadcrumbItem)}
+			</Breadcrumb>
+			<Breadcrumb style={{position:'absolute', marginTop:'18px'}}>
+			    {race2_items.map(createBreadcrumbItem)}
+			</Breadcrumb>
+		</div>
     </div>
 )
 

@@ -120,15 +120,22 @@ module.exports = {
 	},
 	breakdown: (_, {id, level}, {db}) => {
             
-            const queries= {
-                WARD: 'race_ward_breakdown',
-                PRECINCT: 'race_precinct_breakdown'
-            }
-            
-            return db[queries[level]](id)
-        },
-	demographyMap: (_, {id}, {db}) => db
-	    .demography_ward_map(id)
-	    .then( ([map]) => map ),
+        const queries= {
+            WARD: 'race_ward_breakdown',
+            PRECINCT: 'race_precinct_breakdown'
+        }
+        
+        return db[queries[level]](id)
+    },
+	demographyMap: (_, {id, level}, {db}) => {
+
+		const queries= {
+            WARD: 'demography_ward_map',
+            PRECINCT: 'demography_pct_map'
+        }
+        return db[queries[level]](id)
+	    .then( ([map]) => map )
+	},
+
     }
 }

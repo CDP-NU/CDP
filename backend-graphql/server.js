@@ -4,10 +4,10 @@ const bodyParser = require('body-parser')
 const massive = require('massive')
 const schema = require('./data/schema')
 
-const connectionString = 'postgres://eroubenoff:144230@localhost:5432/election7'
+const connectionString = 'postgres://eroubenoff:144230@localhost:5432/election8'
 //election5 is the working database
 //election7 is the new one 
-
+//Now on election8
 massive({connectionString}).then( db => {
 
     const GRAPHQL_PORT = 8080;

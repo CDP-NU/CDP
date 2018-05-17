@@ -63,10 +63,14 @@ export default compose(
         	endDate: (toString(e.target.value) === "true") ? (`${selectMax(location.pathname)}/12/31`) : ( `2018/12/31` ),
             compare: e.target.value
         }),
-	    resetSearch: () => () => ({
+	    resetSearch: ({location}) => () => ({
 			keyword: '',
-			elections: [],
-			office: []
+		    startDate: `${selectMin(location.pathname)}/01/01`,
+		    endDate: `${selectMax(location.pathname)}/12/31`,
+		    elections: [],
+		    offices: [],
+		    demographies: [],
+	        compare: "false"
 	    })
 	}),
     withProps( ({keyword, elections, offices, demographies, compare}) => ({
@@ -111,9 +115,6 @@ export default compose(
 		endYear: parseInt(endDate.substr(0, 4), 10)
     })),
     withHandlers({
-    onClear: ({history}) => () => {
-	    history.push(`/`)
-    },
 	onSearchResultClick: ({resetSearch}) => () => {
 	    
 	    const isMobile = window
@@ -122,6 +123,10 @@ export default compose(
 
 	    if(isMobile) {
 		resetSearch()
-	    }}
+	    }},
+    onClear: ({history, resetSearch}) => () => {
+	    history.push(`/`)
+	    resetSearch()
+    }
     })
 )(DatabaseSearch)

@@ -60,7 +60,7 @@ const DemographyCard = ({
     onSelect,
     compare
 }) => (
-    <Card title={<Link to={`/demography/${measure}/ward`} onClick={onSelect}>{`${measure}`}</Link>}
+    <Card title={<Link to={`/demography/${measure}/WARD`} onClick={onSelect}>{`${measure}`}</Link>}
 	  bodyStyle={{ padding: 0 }}>
 	<div style={{padding: '10px 16px'}}>
 	    <p>{category}</p>

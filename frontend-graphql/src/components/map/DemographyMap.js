@@ -9,9 +9,14 @@ import Geocode from './Geocode'
 const RadioButton = Radio.Button
 const RadioGroup = Radio.Group
 
+const zoneKeys = {
+    "WARD": 'ward',
+    "PRECINCT": 'wpid'
+}	
+
 const demographyMapQuery = gql`
-query DemographyMap($id: ID!) {
-    demographyMap(id: $id) {
+query DemographyMap($id: ID!, $level: LEVEL!) {
+    demographyMap(id: $id, level: $level) {
         colors
         stdcats {
             color
@@ -19,7 +24,7 @@ query DemographyMap($id: ID!) {
             stdmax
         }
     }  
-    geojson(year: 2015, level: WARD)
+    geojson(year: 2015, level: $level)
 }`
 const geocodeQuery = gql`
 query Geocode($street: String!) {
@@ -33,7 +38,7 @@ query Geocode($street: String!) {
 
 const DemographyMap = ({geojson, colors, legend, onGeocode, onLevelChange, level}) => (
     <Map className="map-container">
-    <div className="geocode_container" >
+	    <div className="geocode_container" >
 			<Collapse defaultActiveKey={['mapTools']} bordered={false} style={{backgroundColor:"transparent"}}>
 			<Collapse.Panel header="Map Tools" key="mapTools" style={{color:"transparent"}}>
 				<p><Icon type="environment"/> Go to address</p>
@@ -41,16 +46,16 @@ const DemographyMap = ({geojson, colors, legend, onGeocode, onLevelChange, level
 				<RadioGroup style={{marginTop:10}}
 					    value={level}
 					    onChange={onLevelChange}>
-				    <RadioButton value="ward">Ward</RadioButton>
-				    <RadioButton value="precinct">Precinct</RadioButton>
+				    <RadioButton value="WARD">Ward</RadioButton>
+				    <RadioButton value="PRECINCT">Precinct</RadioButton>
 				</RadioGroup>
 			</Collapse.Panel>
 		    </Collapse>
 		</div>
-	<MapGeojson zoneKey="ward"
-		    geojson={geojson}
-		    colors={colors}
-		    legend={legend}/>
+		<MapGeojson zoneKey={zoneKeys[level]}
+			    geojson={geojson}
+			    colors={colors}
+			    legend={legend}/>
     </Map>
 )
 
