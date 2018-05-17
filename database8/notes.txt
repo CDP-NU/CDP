@@ -1,0 +1,5 @@
+psql commands must be executed from root if on the linux server (sudo -i)
+
+
+to create a dump of the database on the server:
+pg_dump -Fc election5 -U 'cdp' -p 5432 --no-privileges --no-owner > election.bak
