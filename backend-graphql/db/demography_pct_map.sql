@@ -1,4 +1,4 @@
-SELECT w.legend AS stdcats,
-    w.colors
-FROM demography_ward_maps w
-WHERE w.measure = $1
+SELECT p.legend AS stdcats,
+    p.colors
+FROM demography_precinct_maps p
+WHERE p.measure = $1
