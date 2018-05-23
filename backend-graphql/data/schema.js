@@ -68,10 +68,16 @@ type CandidateZoneData {
   pct: Int
 }
 
+type DemographyZoneData {
+  measure: String
+  pct: Float
+}
+
 type SearchResult {
   label: String
   description: JSON
 }
+
 
 type Query {
   autocomplete(value: String): [String]!
@@ -83,9 +89,11 @@ type Query {
   raceWardStats(id: ID!): [WardStats]!
   geocode(street: String): Geocode
   zoneCandidateData(race: ID!, level: LEVEL, zone: Int): [CandidateZoneData]!
+  zoneDemographyData(id: ID!, level: LEVEL, zone: Int): DemographyZoneData
   breakdown(id: ID!, level: LEVEL!): [JSON]
   demographyMap(id: ID!, level: LEVEL!): DemographyMap!
   compareCandidate(id: ID!, candidate: Int!):  JSON!
+  demographyLevels(id: ID!, level: LEVEL!): JSON
 }`
 
 const schema = makeExecutableSchema({ typeDefs, resolvers })

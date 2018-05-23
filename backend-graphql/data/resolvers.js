@@ -113,6 +113,16 @@ module.exports = {
 
 	    return db[queries[level]](race, zone)
 	},
+	zoneDemographyData: (_, {id, level, zone}, {db}) => {
+
+	    const queries = {
+		WARD: 'demography_ward',
+		PRECINCT: 'demography_precinct'
+	    }
+
+	    return db[queries[level]](id, zone)
+	    .then(([ret]) => ret)
+	},
 	compareCandidate: (_, {id, candidate}, {db}) => {
 
 	    const candidateID = `${id}+${candidate}`
@@ -137,5 +147,13 @@ module.exports = {
 	    .then( ([map]) => map )
 	},
 
-    }
+	demographyLevels: (_, {id, level}, {db}) => {
+		const queries ={
+			WARD: 'demography_ward_measure',
+			PRECINCT: 'demography_pct_measure'
+		}
+		//return {"ward" : ward, "pct" : pct}
+		return db[queries[level]](id)
+    },
+}
 }

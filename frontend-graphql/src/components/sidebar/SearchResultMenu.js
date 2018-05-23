@@ -64,7 +64,11 @@ const DemographyCard = ({
 	  bodyStyle={{ padding: 0 }}>
 	<div style={{padding: '10px 16px'}}>
 	    <p>{category}</p>
+	    <p>2015 American Community Survey</p>
 	</div>
+	<CandidateMenu raceID={measure}
+					candidates={["ward", "precinct"]} 
+					onSelect={onSelect}/>
     </Card>
 )
 

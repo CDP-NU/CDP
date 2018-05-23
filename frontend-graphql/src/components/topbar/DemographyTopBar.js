@@ -34,7 +34,7 @@ const createBreadcrumbItem = item => (
 )
 
 const style = {display: 'inline-block', marginRight: '20px'}
-const capitalize = { "ward" : "Ward", "precinct" : "Precinct"}
+const capitalize = { "WARD" : "Ward", "PRECINCT" : "Precinct"}
 
 const Path = ({
 	title,

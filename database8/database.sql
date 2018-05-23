@@ -151,6 +151,7 @@ CREATE TABLE candidates (
   slug text UNIQUE
 );
 
+
 CREATE TABLE candidate_wards (
   candidate SERIAL REFERENCES candidates,
   ward int,
@@ -160,13 +161,16 @@ CREATE TABLE candidate_wards (
   PRIMARY KEY(candidate, ward)
 );
 
+--For whatever reason there are duplicate records for candiate_precincts.  A bad fix 
+--is to just remove the primary key (which I did for now) until we can solve this
+--Something to do with database sync?  Not really sure...
 CREATE TABLE candidate_precincts (
   candidate SERIAL REFERENCES candidates,
   wpid int,
   stdcat int REFERENCES stdcats,
   votes int,
-  pct int,
-  PRIMARY KEY(candidate, wpid)
+  pct int--,
+  --PRIMARY KEY(candidate, wpid)
 );
 
 CREATE TABLE candidate_ward_stdcats (
