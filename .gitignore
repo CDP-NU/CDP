@@ -2,7 +2,7 @@ node_modules
 npm-debug.log*
 logs
 build
-database8/*.csv
+**/*.csv
 
 # Runtime data
 pids
