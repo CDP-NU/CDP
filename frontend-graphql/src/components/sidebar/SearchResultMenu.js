@@ -1,8 +1,16 @@
 import React from 'react'
 import { withRouter, Link } from 'react-router-dom'
 import { Card, Menu, Icon} from 'antd'
+import { compose } from 'recompose'
+import { gql, graphql } from 'react-apollo'
 const SubMenu = Menu.SubMenu
 
+const demographyLevels = gql`
+	query($id:ID!) {
+		ward: demographyLevels(id: $id, level: WARD)
+		precinct: demographyLevels(id: $id, level: PRECINCT)
+	}
+`
 const CandidateMenuTitle = () => (
     <span>
 	<Icon type="user" />
@@ -10,6 +18,12 @@ const CandidateMenuTitle = () => (
     </span>
 )
 
+const DemographyMenuTitle = () => (
+    <span>
+	<Icon type="user" />
+	<span>Demography Maps</span>
+    </span>
+)
 //For later: build in the link level compare functionality for the candidate menu
 const CandidateMenu = ({raceID, candidates, onSelect}) => (
     <Menu style={{width: '100%', display: 'block'}}
@@ -25,6 +39,26 @@ const CandidateMenu = ({raceID, candidates, onSelect}) => (
 	     )}
 	</SubMenu>
     </Menu>
+)
+
+const DemographyMenu = compose( graphql(demographyLevels)
+	( ({id, onSelect, data}) => 
+    <Menu style={{width: '100%', display: 'block'}}
+	  mode="inline" selectedKeys={[]}>
+	<SubMenu key="sub1" title={<DemographyMenuTitle/>}>
+		{data.ward ? (
+		    <Menu.Item>
+				<Link to={`/demography/${id}/WARD`}>Ward Demography</Link> 
+		    </Menu.Item> )
+		: null}
+		{data.precinct ? (
+		    <Menu.Item>
+				<Link to={`/demography/${id}/PRECINCT`}>Precinct Demography</Link> 
+		    </Menu.Item> )
+		: null}
+	</SubMenu>
+    </Menu>
+	)
 )
 
 const CompareLink = (id, race1, compare) => ((compare === "true" ) && (race1 !== undefined)) ? `/race/${race1}/compare/${id}/compare_candidates/1/1` : `/race/${id}/maps/ward`
@@ -66,8 +100,7 @@ const DemographyCard = ({
 	    <p>{category}</p>
 	    <p>2015 American Community Survey</p>
 	</div>
-	<CandidateMenu raceID={measure}
-					candidates={["ward", "precinct"]} 
+	<DemographyMenu id={measure}
 					onSelect={onSelect}/>
     </Card>
 )

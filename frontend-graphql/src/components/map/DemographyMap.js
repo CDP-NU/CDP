@@ -56,8 +56,8 @@ const DemographyMap = ({geojson, colors, legend, onClick, popup, onGeocode, onLe
 				<RadioGroup style={{marginTop:10}}
 					    value={level}
 					    onChange={onLevelChange}>
-				    <RadioButton disabled={_.isEmpty(levels.ward)} value="WARD">Ward</RadioButton>
-				    <RadioButton disabled={_.isEmpty(levels.precinct)} value="PRECINCT">Precinct</RadioButton>
+				    <RadioButton disabled={levels.ward == null} value="WARD">Ward</RadioButton>
+				    <RadioButton disabled={levels.precinct == null} value="PRECINCT">Precinct</RadioButton>
 				</RadioGroup>
 			</Collapse.Panel>
 		    </Collapse>

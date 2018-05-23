@@ -152,8 +152,7 @@ module.exports = {
 			WARD: 'demography_ward_measure',
 			PRECINCT: 'demography_pct_measure'
 		}
-		//return {"ward" : ward, "pct" : pct}
-		return db[queries[level]](id)
+		return db[queries[level]](id).then(([result]) => result)
     },
 }
 }
