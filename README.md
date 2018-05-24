@@ -136,26 +136,67 @@ These are "appended" to `document.getElementByID('root')`, which finds the eleme
 
 # Component Tree
 ```
-                                    index.js
-                                        |
-                                    App.js
-                                    <App />
-                       _____________/ | \________________________________________________ 
-                      /               |                                                  \
-              [Sidebar]            [TopBar]                                               [Main Content]
-              /                       |                                            ________/  |      |___________________________________________
-              |                 ______________________                            /           |                                |                 \
-<DatabaseSearchContainer />    | <HomeTopBar />      |        <MapPageContainer />        <GraphPage />                     <ComparePage />     <DemographyMap />
-              |                | <CompareTopBar />   |              |                   /       |        \                     |                      |
-<DatabaseSearch />             | <TopBar />          |         <MapPage />   <BarGraph /> <Breakdown /> <Scatterplot />        |                    <Map />
-              |                | <DemographyTopBar />|              |                                __________________________/                      |
-              |                |_____________________|          <Map />                             /                      \                    <MapGeojson />
-<SearchResultMenu />                |                           /     \                  <CompareCandidatesWrap />    <CompareBarGraph />
-                                <Help />               <RaceMap /> <CandidateMap />       ________|______________
-                                                                \      /                 | <CandidateSelect />   |
-                                                              <HeatMap />                | <CompareCandidates /> |
-                                                                  |                      |_______________________|
-                                                           <MapGeojson />
+index.js
+  |
+<App />
+  |----[Sidebar]
+  |    <Switch>
+  |       |
+  |       |----<DatabaseSearchContainer /> 
+  |                   |
+  |                   |----<DatabaseSearch />
+  |                               |
+  |                               |----<SearchResultMenu />
+  |
+  |----[TopBar]
+  |    <Switch>
+  |       |                           |
+  |       |----<HomeTopBar />         |
+  |       |----<CompareTopBar />      |-- <Help />
+  |       |----<DemographyTopBar />   |
+  |       |----<TopBar />             |
+  |
+  |
+  |----[Main Content]
+          |
+       <Switch>
+          |----<MapPageContainer />
+          |           |
+          |           |----<MapPage />
+          |                     |
+          |                     |----<Map />
+          |                             |
+          |                         <Switch>                 
+          |                             |----<RaceMap />      |----<HeatMap />
+          |                             |----<CandidateMap /> |       |  
+          |                                                           |----<MapGeojson />
+          |----<GraphPage />
+          |         |
+          |         |----<BarGraph />
+          |         |----<Breakdown />
+          |         |----<Scatterplot />
+          |
+          |----<DemographyMap />
+          |         |
+          |         |----<Map />
+          |                 |
+          |                 |----<MapGeojson />
+          |
+          |----<ComparePage />
+                    |
+                  <Switch>
+                    |----<CompareBarGraph />
+                    |----<CompareCandidatesWrap />
+                                  |
+                                  |----|<CandidatesSelect /> |
+                                       |<CompareCandidates />|
+
+
+
+
+
+
+
 ```
 
 
