@@ -2,14 +2,13 @@
 ## by Ethan Roubenoff
 ### Drafts 14 August 2017, 29 April 2018
 
-This is a general schematic of the CDP website as it stands.
+This is a general schematic of the CDP website as it stands.  There are four components of the website: the frontend, the backend, the server and the database.  The first two are very clearly delineated but the latter are more or less one big thing.  In the frontend you will find presentational components (stuff you see).  The database holds the data in an easy-to-read format.  The frontend gives a command to the backend to ask the server to get some data from the database.
 
 ## Mac Installation Instructions
 
 [Install postgres](https://postgresapp.com/)
-Place the election dump in (usually a .bak file) in an easy to access directory. [This is a generally useful link for help.](https://www.codementor.io/engineerapart/getting-started-with-postgresql-on-mac-osx-are8jcopb)
-Postgres is funky.  When you install it, there will be a default database called 'postgres' created AND a default role (in other words, a username) called 'postgres.'  Create a local username (usually postgres)
-In bash, run the command `pg_restore -C -d postgres election_dump.bak`, where `election_dump.bak` is the dump file of the database. This command opens postgres databse 'postgres' and then creates a new database named election5 or whatever was specificed in the dump.  This is crucial.
+
+Place the election dump in (usually a .bak file) in an easy to access directory. See below for creating a database. [This is a generally useful link for help.](https://www.codementor.io/engineerapart/getting-started-with-postgresql-on-mac-osx-are8jcopb). Postgres is funky.  When you install it, there will be a default database called 'postgres' created AND a default role (in other words, a username) called 'postgres.'  Create a local username (usually postgres).  In bash, run the command `pg_restore -C -d postgres election_dump.bak`, where `election_dump.bak` is the dump file of the database. This command opens postgres database 'postgres' and then creates a new database named election5 or whatever was specificed in the dump.  This is crucial.
 
 [Install Node and NPM](http://blog.teamtreehouse.com/install-node-js-npm-mac)
 
@@ -24,7 +23,7 @@ Navigate to CDP/backend-graphql/server.js and change the connectionString to be 
 Open Google Chrome and postgres. Then, navigate to CDP/backend-graphql and enter `nodemon start`. Next, open a new terminal tab/window and navigate to CDP/frontend-graphql. Enter `nodemon start`. Google Chrome should begin loading the site.  You need to keep both of these windows opwn.  Note, nodemon is a npm plugin that reboots the server when anything changes.  I find it very useful.
 
 
-## Creating a production build
+## Creating a production build to put on the server
 
 The frontend uses [create-react-app-antd](https://github.com/ant-design/create-react-app-antd). This boilerpate is based on https://github.com/facebookincubator/create-react-app and provides hot-module-reloading, linting, minification, autoprefixer, webpack, babel, and other nice development tools. 
 
@@ -36,18 +35,47 @@ On your local machine, run the following commands:
  - Change the `connectionString` to `postgres://cdp:lakefill@localhost:5432/election5`
  - Uncomment the lines underneath `/*** IN PRODUCTION ***/`
  - Remove `CDP/backend-graphql/node_modules` if it exists
-5. Move `CDP/backend-graphql` to the server. It doesn’t matter where the folder is put. The current version is under `shared/cdpnext2`
+5. Move `CDP/backend-graphql` to the server.  Once you're in, `sudo -i` and move the folder to `root/current_site`.  Be sure to keep a version of the previous website in `site_archives`.
 6. `ssh ` into the server and `cd` into the folder
 7. run `npm install`
 8. run `forever stopall`
 9. run `NODE_ENV=production forever start server.js`
 
-## Frontend
+Common troubleshooting things: sometimes the command `forever stopall` doesn't actually stop everything.  If you're trying to load a new build and it keeps crashing, run a variant of `sudo killall node`.
+
+## Creating a database
+
+Navigate to the current database folder in the repo (currently `database8/`).  The file `database.sql` contains a sql script that will turn four .csv files (demography and race at the ward and precinct levels).  If you need to make a new version of the database make sure you save the current one.
+
+Instructions for updating a database (by way of creating a new database):
+
+1. create a copy of the current database folder and store as a .tar.gz
+2. cd into new database folder
+3. if needed, convert .dta files to .csv 
+4. replace the relevant .csv files keeping the same names [wardALLshortr.csv, precinctALLshortr.csv, CDPDemographyACS2014Ward2015Stacked.csv].  Compare the new files with the old files— you may need to rearrange some columns.  NOTE that the sql file only works if the columns are in the exact same order as the old file!!
+5. enter `source create.sh name-of-database` to populate a new database with the data
+6. update `backend-graphql/server.js` to reflect the name of the new server, if different from current
+
+Note: Do this all on your local machine first! Do not mess up the server. Option: copy this database folder onto your local machine, make sure it works, create a dump, copy the dump to the server and run the restore command
+Note: pg_restore and pg_dump are really, really finnecky commands.  In order for them to work, there must be a postgres database already up and running on the server (which usually is true).  This is just a superuser database.  On the server it is called 'cdp'; on your local machine it may be called something different.  To check what databases are already up and running on your local machine, in terminal run:
+                `psql
+                \l`
+and pick from any of the ones listed.
+Note: You can name the new database anything you want.  In order to preserve continuity we call them "election#", where # is just the serial number we're on.  As of writing this, we're on "election5", and I will name the next one "election6", etc. When you create a backup of the database you can call it election5.tar.gz and current database (whatever it is called) should be in the "current_database" folder.
+
+
+to create a dump of the database on the server (note that for these commands you need to use the role 'cdp' but on your local machine, use whatever your local superuser is; and there are no quotes around anything!!):
+        `pg_dump -Fc 'name-of-database' -U 'cdp' -p 5432 --no-privileges --no-owner > election.bak`
+
+to restore the dump to a server:
+        `pg_restore -U ‘cdp’ -d ‘name-of-database’ -p 5432 database.bak`
+
+
 
 #### A note on Higher Order Components (HOCs)
 This was one of the hardest parts of the website for me to understand, so I'm going to go into very elaborate detail here. HOCs allow for modularity, which is the key funciton of React.  We could just as easily explicitly call a component, but the React ideology is all about modularity, so we do this.
 
-Our implimentation of HOCs follow the general formula: `compose(some modifiers)(Base component) = HOC`.  Let's say we have a very simple base component, like such:
+Our implementation of HOCs follow the general formula: `compose(some modifiers)(Base component) = HOC`.  Let's say we have a very simple base component, like such:
    ```javascript
    const BaseComponent = ({prop1, prop2}) => {console.log(prop1, prop2) return null}
    ```
@@ -86,12 +114,6 @@ Is where things get interesting.  There are two things going on here: we're mapp
 -  `withHandlers(onGraphChange: (...))` defines the onGraphChange callback we discussed above.  It takes the `raceID` and `history` props and the `graph` value and pushes a new URL with those variables.
 These are then bound to ScatterPlotPage, and the 'enhanced' version of ScatterPlotPage is what is exported as default. 
 
-### index.html
-The website "begins" at public/index.html, which effectively does nothing.  The <head></head> tag contains metadata about the website.
-Inside the `<body></body>` tag, there is a `<div id="root" />` tag, which is used for react DOM bindings.
-
-cd src (change working directory to i~/frontend-graphql/src/)
-
 ### src/index.js
 index.js is used to initialize the website.  There are two things going on here: initializing the client/redux store and rendering the app.
 The first block initializes the ApolloClient, used for graphql, and the redux store used for managing global state.
@@ -112,103 +134,37 @@ The second block, beginning with `ReactDOM.render(` does just that: renders the 
 
 These are "appended" to `document.getElementByID('root')`, which finds the element `<div id="root">` we defined in index.html and appends those things to it.
 
-#### other things in /src/:
-- actions.js : actions for redux
-- index.css : stylesheet for the main app.  Nothing important is in here
-- map.js : the base leaflet map
-- reducers.js : reducers for redux (the core of redux)
-- utility.js : other useful things for the website.  To be phased out.
+# Component Tree
+```
+                                    index.js
+                                        |
+                                    App.js
+                                    <App />
+                       _____________/ | \________________________________________________ 
+                      /               |                                                  \
+              [Sidebar]            [TopBar]                                               [Main Content]
+              /                       |                                            ________/  |      |___________________________________________
+              |                 ______________________                            /           |                                |                 \
+<DatabaseSearchContainer />    | <HomeTopBar />      |        <MapPageContainer />        <GraphPage />                     <ComparePage />     <DemographyMap />
+              |                | <CompareTopBar />   |              |                   /       |        \                     |                      |
+<DatabaseSearch />             | <TopBar />          |         <MapPage />   <BarGraph /> <Breakdown /> <Scatterplot />        |                    <Map />
+              |                | <DemographyTopBar />|              |                                __________________________/                      |
+              |                |_____________________|          <Map />                             /                      \                    <MapGeojson />
+<SearchResultMenu />                |                           /     \                  <CompareCandidatesWrap />    <CompareBarGraph />
+                                <Help />               <RaceMap /> <CandidateMap />       ________|______________
+                                                                \      /                 | <CandidateSelect />   |
+                                                              <HeatMap />                | <CompareCandidates /> |
+                                                                  |                      |_______________________|
+                                                           <MapGeojson />
+```
 
-cd components (working directory: ~/frontend-graphql/src/components)
 
-### Components is where the real meat of the frontend happens
 
-### App.js
-App.js is the first thing rendered (in index.js, it just calls it up.)  When called, App immediately calls its render method, which returns two divs (for simplicity's sake, sub-elemnts are listed as sublists, not nested div tags: 
--  `<div className="sidebar">` : the sidebar container
-    `<div className="sidebar_header">` : the sidebar header, with the home button, and "Browse Database" text
-    `<DatabaseSearchContainer />` : the component used to search the database.  See below for further explaination.
--  `<div className="main-conentent">`
-    `<Route path="/race/:raceID/:display component = {TopBar}>"` : the topbar.  The Route element means 'if we reach this path, render the top bar.'  We will always reach this path (there is no conditional part yet)
-    `<Switch>` : think of this as an if statement.  If any of the following routes are true, render the following component:
-      This part is fairly self explainatory: if the route is x, render component y.
-Note: in `<Route>` components, any part of the `path` beginning with `:` is a variable and passed to the rendered ('child') component.  For example, if `path= "/race/raceA/compare/raceB"`, the ComparePage component will be rendered, and raceID and raceID2 will be passed to ComparePage with values raceA and raceB, respectively.
 
-So far, our component tree is:
-`                        
-                            Index.js
-                            App.js
-                           /       \
-                    sidebar         main-content
-     DatabaseSearchContainer        Switch
-                                /      |       \
-                    MapPageContainer GraphPage  ComparePage
-`
-We `export default App`, which is picked up by Index.js.
 
-### MapPageContainer
-Mostly a container for the map page, as the name suggests.  Runs graphql queries to get the candidates for a race (`raceCandidatesQuery`) and a geocode (`geocodeQuery`).  Binds the following to MapPage:
-- props: RaceID (from match.params), raceYear, raceGeoYear, url, and history
-- graphql raceCandidatesQuery
-- withState geocoderequest
-- graphql geocodeQuery 
-- withHandlers onGeocode
 
-What this does: takes the props from the App component, queries the database for candidates, sets the react state to the given geocode, queries the database for that geocode, and defines a callback for handling a geocode.  These are then passed to MapPage.
 
-### MapPage
-Takes in a whole bunch of props, that are all passed to it by MapPageContainer.  Based on what the current URL is-- either broken down by ward or precinct, or either of those for a specific candidate, it renders a RaceMap, as defined in RaceMap.js.
 
-### RaceMap
-Queries the database for a map and geojson, maps some props to relevant props, keeps the prop listening for changes to the geojson, then maps the colors in the database to the raceMap.  All of this is passed to HeatMap.
 
-### HeatMap
-HeatMap is the actual color we see on the map.  
 
-### Map
-A wrapper for leaflet.
 
-Wow, that was a lot.  Here's our component tree now:
-`                        
-                            Index.js
-                            App.js
-                           /       \
-                    sidebar         main-content
-     DatabaseSearchContainer        Switch
-                                /           |       \
-                    MapPageContainer    GraphPage  ComparePage
-                            |
-                        <Map>
-                        MapPage
-                        RaceMap
-                        HeatMap
-                        </Map>
-`
-### GraphPage
-GraphPage, confusingly enough, actually renders a component called ScatterPlotPage.  The mechanics of GraphPage were described above in the part about HOC, so I won't go into too much detail there.  GraphPage is more or less a container that, given the URL of the page, either renders a BarGraph, ScatterPlot, or Breakown.  All three of these more or less follow the same pattern.
-Thing to note: in clauses with `<Route path=/race/:raceID/graphs/candidatesrender{() => BarGraph race={raceID}}`, a couple of things to note: any part of the path beginning with `:` can be accessed as a prop in either of two ways.
-- Like it is in the above example: Bargraph is rendered with race value raceID.
-- In BarGraph, the parent prop `match.raceID` could be mapped to the child component's prop `raceID`.  
-
-### BarGraph, ScatterPlot, and Breakdown
-I'm going to use BarGraph for the example here since it's the most straightforward, but they all follow the same logic.
-
-These components are called with a specific raceID, which is passed to the component's raceID prop.  So for each of these components, there is a raceID prop with the value of the current race displayed. These components, oddly enough, work from the bottom of the document up.  Let's start at `compose(`:
-- First, runs a graphQL query on the raceID prop that was passed to it.  Returns whatever data is needed for the specific component.  GraphQL, unless told to do otherwise, will put all returned data in a prop called `data`.  How convenient!  
-- Next, flatten that `data` prop.  This turnes a nested array into a flat array.  
-- Branch: basically if the component is loading or there's a problem, don't render the component until it's resolved. 
-- mapProps: take the race.candidates prop passed in from data and just call it candidates.
-These are used to enhance the `BarGraph` component, which is largely a container component.
-
-Here's the BarGraph component broken down: 
-- `componentDidMount`: if it successfully did mount with no issues, call the loadD3 function with the `candidates` prop as an argument.
-- `componentWillRecieveProps`: if the component's `candidates` prop changes, loadD3 with this updated prop.  I don't think this is called very often.
-- `componentShouldUpdate`: no, it shouldn't.  The data isn't dynamic.
-- `render()` if all goes well, the component renders a `<div id="bargraph />`.  
-Now, these aren't necessarily called in this order.  GraphPage explicitly calls BarGraph's `render` method, so the first thing it does is render the div, then calls loadD3.  Reminder that BarGraph has at this point already been enhanced by the `compose` function. 
-
-Now, `loadD3` basically takes in whatever data you pass it, and renders the graph accordingly.  It's would take too long to explain the d3 functionality here, so I'm giong to just markup the files itself explaining what's going on.
-
-One key line from each `loadD3` function is: `const bargraph = d3.select("#bargraph")`-- this allows d3 to append the graph to the `<div id="bargraph" />` already rendered.`
-
-### ComparePage

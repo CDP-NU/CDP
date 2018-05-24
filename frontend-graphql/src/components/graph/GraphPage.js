@@ -9,7 +9,7 @@ import Breakdown from './Breakdown'
 const {Option} = Select
 
 
-const ScatterPlotPage = ({raceID, graph, url, onGraphChange}) => (
+const GraphPage= ({raceID, graph, url, onGraphChange}) => (
     <div className="scatter-plot_page">
 	<Switch>
 	    <Route path="/race/:raceID/candidates"
@@ -33,4 +33,4 @@ export default compose(
 	onGraphChange: ({raceID, history}) => graph =>
 	    history.push(`/race/${raceID}/graphs/${graph}`)
     })
-)(ScatterPlotPage)
+)(GraphPage)
