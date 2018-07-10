@@ -7,6 +7,7 @@ import '../css/MainContent.css'
 import { Switch, Route, matchPath } from 'react-router-dom'
 import CompareBarGraph from './CompareBarGraph'
 import CompareCandidatesWrap from './CompareCandidatesWrap'
+import {selectMin, selectMax }from '../sidebar/DatabaseSearch'
 
 const compareQuery=gql`
 query compare($raceID: ID!) {

@@ -220,13 +220,6 @@ index.js
                                   |
                                   |----|<CandidatesSelect /> |
                                        |<CompareCandidates />|
-
-
-
-
-
-
-
 ```
 
 

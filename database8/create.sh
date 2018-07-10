@@ -2,7 +2,7 @@
 
 database=${1:-election}
 
-psql --command="DROP DATABASE IF EXISTS $database"
+psql -—command="DROP DATABASE IF EXISTS $database"
 psql --command="CREATE DATABASE $database"
 
 psql --dbname "$database" -f extensions.sql

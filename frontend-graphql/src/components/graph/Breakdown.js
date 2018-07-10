@@ -62,8 +62,6 @@ const loadD3 = (data = []) => {
 
     //data comes in as a huge array; each entry in the data is one candidate per ward.  So if there are 20 wards and 2 candidates, there will be 40 elements in the array.
 
-    //console.log(data);
-
     //create and array 'candidates' that is an array of the candidates (also will be the z axis)
     let candidates = [];
     data.race.candidates.forEach(function(candidate) {
@@ -85,21 +83,6 @@ const loadD3 = (data = []) => {
         wardData.push(obj);
     };
     
-
-    //uncomment below for a breakdown normalized at 100%
-    /*
-       data.breakdown.forEach(function(element){
-       for(var i = 0; i < wardData.length; i++){
-       if (wardData[i].ward === element.ward) {
-       var can = element.candidate;
-       wardData[i][can] = element.percent; 
-       }
-       }
-       
-       });
-
-     */
-    
     //the following code makes the height of the bar the  total votes cast, broken down by candidate.
     //
     data.breakdown.forEach(function(element){
@@ -112,22 +95,17 @@ const loadD3 = (data = []) => {
         
     });
 
-    //console.log("wardData", wardData);
-
 
     //now let's get to drawing!!
     
     const stack = d3.stack()
 		    .keys(candidates);
-  //  console.log("stack", stack);
-
     const stacked = stack(wardData);
-    //console.log("stacked", stacked);
     const maxY = d3.max(stacked, function(d) {
         return d3.max(d, function(d) {
             return d[1];
         });
-    }); //console.log("stacked keys", stacked[0][0].data);
+    }); 
 
     const margin = {top:10, right:10, bottom:90, left: 80};
     const width = 960 - margin.left - margin.right; 
@@ -146,7 +124,10 @@ const loadD3 = (data = []) => {
 
     const xAxis = d3.axisBottom()
 		    .scale(xScale)
-		    .ticks(5)
+        .tickValues( xScale.domain().filter((d,i) => { 
+            return !(i%5)
+          })
+        );
     
     
     const yAxis = d3.axisLeft()
@@ -202,19 +183,6 @@ const loadD3 = (data = []) => {
        }); 
      */
 
-    //for the grid
-    /*
-       //I don't think we need vertical gridlines
-       svgContainer.append("g")			
-       .attr("class", "grid")
-       .attr("transform", "translate(0," + height + ")")
-       .call( d3.axisBottom(xScale)
-       .ticks(5)
-       .tickSize(-height)
-       .tickFormat("")
-       );
-     */
-
     svgContainer.append("g")			
 		.attr("class", "grid")
 		.call( d3.axisLeft(yScale)
@@ -253,13 +221,13 @@ const loadD3 = (data = []) => {
 
     //y axis label
     svgContainer.append("text")
-		.attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
-		.attr("transform", "translate("+ (-60) +","+(height/2)+")rotate(-90)")  // text is drawn off the screen top left, move down and out and rotate
-		.text("Number of Votes");
+            		.attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
+            		.attr("transform", "translate("+ (-60) +","+(height/2)+")rotate(-90)")  // text is drawn off the screen top left, move down and out and rotate
+            		.text("Number of Votes");
     //x axis label 
     svgContainer.append("text")
                 .attr("text-anchor", "middle")
-		.attr("transform", "translate("+ (width/2) +","+(height + 50)+ ")")    // text is drawn off the screen top left, move down and out and rotate
+		            .attr("transform", "translate("+ (width/2) +","+(height + 50)+ ")")    
                 .text("Ward");
 
 
